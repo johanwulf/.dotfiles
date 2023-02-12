@@ -1,0 +1,14 @@
+alias v="nvim"
+alias vim="nvim"
+alias n="nvim"
+alias src="source ~/.zshrc"
+alias c="clear"
+alias grep="grep --color"
+alias ls="ls --color=auto"
+alias la="ls -a"
+alias ll="ls -al"
+alias -s {js,its,html,css,jsx,tsx}=nvim
+
+oic () {
+    open --new -a "Google Chrome" --args $1
+}
