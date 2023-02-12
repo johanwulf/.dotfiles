@@ -46,6 +46,10 @@ brew install fd
 ```
 brew install rigrep
 ```
+## lazygit
+```
+brew install jesseduffield/lazygit/lazygit
+```
 
 ## To do:
 - [ ] Update Gist to also download all dependencies
