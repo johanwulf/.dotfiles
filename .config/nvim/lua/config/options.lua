@@ -6,6 +6,10 @@ opt.tabstop = 4
 opt.shiftwidth = 4
 opt.autoindent = true
 opt.expandtab = true
+vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
+	virtual_text = false,
+})
+
 vim.api.nvim_create_autocmd("CursorHold", {
 	buffer = bufnr,
 	callback = function()
