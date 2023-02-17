@@ -5,10 +5,13 @@ These are my dotfiles, which are managed by a bare Git repository. The choice of
 
 Since this repository is already setup, the easiest way to use the following script
 
-[Script link](https://gist.github.com/johanwulf/5f3a0d7cad6ba672740c381d945e172b)
-
-Simply save that Gist to a .sh file and run it. It will move all current dotfiles to a dotfiles-backup folder, and then setup the repository.
-
+[Script link](http://setup.wulf.gg/)
+To easily setup, do the following
+```bash
+curl -L setup.wulf.gg >> setup.sh
+chmod +x setup.sh
+./setup.sh
+```
 
 Other dependencies:
 
@@ -53,4 +56,3 @@ brew install jesseduffield/lazygit/lazygit
 
 ## To do:
 - [ ] Update Gist to also download all dependencies
-- [ ] Create custom domain for the setup script for easy access, for instance wulf.gg/setup 
