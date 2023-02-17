@@ -5,7 +5,7 @@ These are my dotfiles, which are managed by a bare Git repository. The choice of
 
 Since this repository is already setup, the easiest way to use the following script
 
-[Script link](http://setup.wulf.gg/)\\
+[Script link](http://setup.wulf.gg/)  
 To easily setup, do the following
 ```bash
 curl -L setup.wulf.gg >> setup.sh
