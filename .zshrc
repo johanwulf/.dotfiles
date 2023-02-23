@@ -28,3 +28,18 @@ fi
 
 source ~/.config/zsh_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.config/zsh_plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+function journal() {
+    date=$1
+    year=$(date -d "$date" +%Y)
+    month=$(date -d "$date" +%m-%B | tr '[:upper:]' '[:lower:]')
+    day=$(date -d "$date" +%d)
+    dir="$HOME/journal/$year/$month"
+    if [[ ! -d "$dir" ]]; then
+        mkdir -p "$dir"
+    fi
+    file="$dir/$day.md"
+    sed "1s/# Date/# $date/" "$HOME/journal/TEMPLATE.md" > "$file"
+    nvim "$file"
+}
+
