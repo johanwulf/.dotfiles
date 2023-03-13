@@ -11,7 +11,6 @@ vim.g.loaded_netrwPlugin = 1
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
 	virtual_text = false,
 })
-vim.opt.mouse = ""
 
 vim.api.nvim_create_autocmd("CursorHold", {
 	buffer = bufnr,
