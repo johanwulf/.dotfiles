@@ -12,4 +12,4 @@ curl -L setup.wulf.gg >> setup.sh
 chmod +x setup.sh
 ./setup.sh
 ```
-The setup script will download all needed dependencies. It will also remove any files that it would overwrite, and is inteded for new machines only. Consider backing up any of the affected files.
+The setup script will download all needed dependencies. It will also remove any files that it would overwrite, and is intended for new machines only. Consider backing up any of the affected files.
