@@ -1,5 +1,5 @@
 # Wulf dotfiles
-These are my dotfiles, which are managed by a bare Git repository. The choice of going with a bare Git repository instead of, e.g. symlinking, was for simplicity and reproducability.
+These are my dotfiles, which are managed by a bare Git repository.
 
 [Tutorial for a bare git repository from scratch](https://www.atlassian.com/git/tutorials/dotfiles)
 
