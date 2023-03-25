@@ -7,4 +7,4 @@ alias grep="grep --color"
 alias ls="ls --color=auto"
 alias la="ls -a"
 alias ll="ls -al"
-alias -s {js,its,html,css,jsx,tsx}=nvim
+alias -s {js,scss,html,css,jsx,tsx}=nvim
