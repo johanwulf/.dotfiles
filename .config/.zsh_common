@@ -8,3 +8,8 @@ alias ls="ls --color=auto"
 alias la="ls -a"
 alias ll="ls -al"
 alias -s {js,scss,html,css,jsx,tsx}=nvim
+
+mkd() {
+    mkdir $1
+    cd $1
+}
