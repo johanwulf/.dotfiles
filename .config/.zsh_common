@@ -4,9 +4,9 @@ alias n="nvim ."
 alias src="source ~/.zshrc"
 alias c="clear"
 alias grep="grep --color"
-alias ls="ls --color=auto"
-alias la="ls -a"
-alias ll="ls -al"
+alias ls="exa -a"
+alias la="exa -a"
+alias ll="exa -al"
 alias cat="bat"
 alias -s {js,scss,html,css,jsx,tsx}=nvim
 
