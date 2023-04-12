@@ -4,12 +4,15 @@ alias n="nvim ."
 alias src="source ~/.zshrc"
 alias c="clear"
 alias grep="grep --color"
+alias -s {js,scss,html,css,jsx,tsx}=nvim
+
+# Replacements
 alias ls="exa"
 alias la="exa -a"
 alias ll="exa -al"
 alias cat="bat"
-alias -s {js,scss,html,css,jsx,tsx}=nvim
 
+# Utilities
 mkd() {
     mkdir $1
     cd $1
