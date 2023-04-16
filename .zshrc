@@ -16,12 +16,12 @@ export NVM_DIR="$HOME/.nvm"
 eval "$(starship init zsh)"
 alias config='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
 
-# Install plugins
+# Install zsh-autosuggestions if not present 
 if [[ ! -d "$HOME/.config/zsh_plugins/zsh-autosuggestions/" ]]; then
     git clone https://github.com/zsh-users/zsh-autosuggestions ~/.config/zsh_plugins/zsh-autosuggestions
 fi
 
-
+# Install zsh-syntax-highlighting if not present 
 if [[ ! -d "$HOME/.config/zsh_plugins/zsh-syntax-highlighting/" ]]; then
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.config/zsh_plugins/zsh-syntax-highlighting
 fi
