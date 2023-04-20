@@ -16,6 +16,8 @@ export NVM_DIR="$HOME/.nvm"
 eval "$(starship init zsh)"
 alias config='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
 
+# TODO: Check if dependencies are installed, if not - install them
+
 # Install zsh-autosuggestions if not present 
 if [[ ! -d "$HOME/.config/zsh_plugins/zsh-autosuggestions/" ]]; then
     git clone https://github.com/zsh-users/zsh-autosuggestions ~/.config/zsh_plugins/zsh-autosuggestions
