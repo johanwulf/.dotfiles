@@ -15,6 +15,7 @@ require("lazy").setup({
 		{ import = "lazyvim.plugins.extras.lang.json" },
 		-- { import = "lazyvim.plugins.extras.ui.mini-animate" },
 		-- import/override with your plugins
+		{ "rcarriga/nvim-notify", enabled = false },
 		{ import = "plugins" },
 	},
 	defaults = {
