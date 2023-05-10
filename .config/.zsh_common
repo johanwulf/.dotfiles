@@ -34,3 +34,19 @@ fancy-ctrl-z () {
 
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
+
+# Worklog
+worklog () {
+    date=$1
+    year=$(date +%Y)
+    month=$(date +%m)
+    day=$(date +%d)
+    dir="$HOME/worklog/$year/$month"
+    if [[ ! -d "$dir" ]]; then
+        mkdir -p "$dir"
+    fi
+    file="$dir/$day.md"
+    sed "1s/# Date/# $date/" "$HOME/worklog/TEMPLATE.md" > "$file"
+    nvim "$file"
+}
+
