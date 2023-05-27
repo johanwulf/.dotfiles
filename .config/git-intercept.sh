@@ -8,32 +8,30 @@ TEMPLATE="$HOME/personal/nutty-notes/worklog/TEMPLATE.md"
 FILE="$DIR/$YEAR-$MONTH-$DAY.md"
 
 COMMAND=$1
-shift
-ARGS=$@
 
 create_file() {
 	if [[ ! -d "$DIR" ]]; then
 		mkdir -p "$DIR"
 	fi
 	if [[ ! -f "$FILE" ]]; then
-		echo "no file"
 		cp "$TEMPLATE" "$FILE"
+		gsed -i 's/Date/'"$YEAR-$MONTH-$DAY"'/g' $FILE
 	fi
 }
 
 if [[ $PWD = $WORKFOLDER* ]]; then
-	if [ "$COMMAND" == "checkout" ] && [ "$1" == "-b" ]; then
+	if [ "$COMMAND" == "checkout" ] && [ "$2" == "-b" ]; then
 		# Intercept git checkout -b
 		create_file
-		BRANCH=$2
+		BRANCH=$3
 		gsed -i "/^## Branches/a [$BRANCH]($JIRA_LINK$BRANCH)" $FILE
-	elif [ "$COMMAND" == "commit" ] && [ "$1" == "-m" ]; then
+	elif [ "$COMMAND" == "commit" ] && [ "$2" == "-m" ]; then
 		# Intercept git commit -m
 		create_file
-		MESSAGE=$2
+		MESSAGE=$3
 		gsed -i "/^## Commits/a $MESSAGE" $FILE
 	fi
 fi
 
 # Call the original git command with the same arguments
-git $COMMAND $ARGS
+command git "$@"
