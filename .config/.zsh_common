@@ -11,6 +11,7 @@ alias ls="exa"
 alias la="exa -a"
 alias ll="exa -al"
 alias cat="bat"
+alias git="$HOME/.config/git-intercept.sh"
 
 # Utilities
 mkd() {
@@ -34,26 +35,3 @@ fancy-ctrl-z () {
 
 zle -N fancy-ctrl-z
 bindkey '^Z' fancy-ctrl-z
-
-newbranch() {
-    year=$(date +%Y)
-    month=$(date +%m)
-    day=$(date +%d)
-    dir="$HOME/personal/nutty-notes/worklog/$year/"
-    if [[ ! -d "$dir" ]]; then
-        mkdir -p "$dir"
-    fi
-    file="$dir/$year-$month-$day.md"
-    if [[ ! -f "$file" ]]; then
-        touch $file
-    fi
-    echo "[$1]($JIRA_LINK$1)" >> $file
-}
-
-nb() {
-    case $PWD in 
-        ($WORKFOLDER)*) newbranch "$1";;
-    esac
-    git checkout -b $1
-}
-
