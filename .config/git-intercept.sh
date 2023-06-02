@@ -4,7 +4,7 @@ YEAR=$(date +%Y)
 MONTH=$(date +%m)
 DAY=$(date +%d)
 DIR="$HOME/personal/nutty-notes/worklog/$YEAR"
-TEMPLATE="$HOME/personal/nutty-notes/templates/worklog.md"
+TEMPLATE="$HOME/personal/nutty-notes/_templates/worklog.md"
 FILE="$DIR/$YEAR-$MONTH-$DAY.md"
 
 COMMAND=$1
