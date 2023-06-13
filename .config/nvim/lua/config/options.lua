@@ -6,6 +6,8 @@ opt.tabstop = 4
 opt.shiftwidth = 4
 opt.autoindent = true
 opt.expandtab = true
+opt.mouse = ""
+
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 vim.lsp.handlers["textDocument/publishDiagnostics"] = vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
