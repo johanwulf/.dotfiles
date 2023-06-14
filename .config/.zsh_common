@@ -5,6 +5,7 @@ alias src="source ~/.zshrc"
 alias c="clear"
 alias grep="grep --color"
 alias -s {js,scss,html,css,jsx,tsx}=nvim
+alias sed="gsed"
 
 # Replacements
 alias ls="exa"
