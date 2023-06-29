@@ -7,6 +7,7 @@ opt.shiftwidth = 4
 opt.autoindent = true
 opt.expandtab = true
 opt.mouse = ""
+opt.scrolloff = 15
 
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
