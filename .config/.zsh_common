@@ -12,7 +12,7 @@ alias ls="exa"
 alias la="exa -a"
 alias ll="exa -al"
 alias cat="bat"
-alias git="$HOME/.config/git-intercept.sh"
+#alias git="$HOME/.config/git-intercept.sh"
 
 # Utilities
 mkd() {
