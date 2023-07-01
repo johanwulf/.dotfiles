@@ -1,5 +1,4 @@
 #!/bin/bash
-# Usage: git <command> <args>
 YEAR=$(date +%Y)
 MONTH=$(date +%m)
 DAY=$(date +%d)
@@ -22,17 +21,14 @@ create_file() {
 
 if [[ $PWD = $WORKFOLDER* ]]; then
 	if [ "$COMMAND" == "checkout" ] && [ "$2" == "-b" ]; then
-		# Intercept git checkout -b
 		create_file
 		BRANCH=$3
 		gsed -i "/^## Branches/a [$BRANCH]($JIRA_LINK$BRANCH)" $FILE
 	elif [ "$COMMAND" == "commit" ] && [ "$2" == "-m" ]; then
-		# Intercept git commit -m
 		create_file
 		MESSAGE=$3
 		gsed -i "/^## Commits/a $MESSAGE" $FILE
 	fi
 fi
 
-# Call the original git command with the same arguments
 command git "$@"
