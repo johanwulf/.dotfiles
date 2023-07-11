@@ -3,13 +3,13 @@ env:
 
 font:
   normal:
-    family: GoMono Nerd Font
+    family: JetBrainsMono Nerd Font
     style: Regular
   bold:
-    family: GoMono Nerd Font
+    family: JetBrainsMono Nerd Font
     style: Bold
   italic:
-    family: GoMono Nerd Font
+    family: JetBrainsMono Nerd Font
     style: Italic
 
   size: 16
@@ -25,9 +25,6 @@ key_bindings:
   - { key: Left, mods: Alt, chars: "\x1BB" }
 
 window:
-  padding:
-    x: 5
-    y: 5
   decorations: None
 
 colors:
