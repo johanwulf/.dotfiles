@@ -1,3 +1,4 @@
+export EDITOR=nvim 
 alias v="nvim"
 alias vim="nvim"
 alias n="nvim ."
@@ -35,11 +36,15 @@ fancy-ctrl-z () {
 }
 
 zle -N fancy-ctrl-z
-bindkey '^Z' fancy-ctrl-z
+bindkey ^Z fancy-ctrl-z
 
 fzf-folder () {
     cd $(find $HOME/IKEA $HOME/personal $HOME/.config -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) | fzf)
 }
 
 zle -N fzf-folder
-bindkey '^F' fzf-folder
+bindkey ^F fzf-folder
+
+autoload edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd v edit-command-line

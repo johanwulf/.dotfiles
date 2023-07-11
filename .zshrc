@@ -1,3 +1,7 @@
+## VI mode
+bindkey -v
+export KEYTIMEOUT=1
+
 # Import aliases common for work/private
 if [ -f ~/.config/.zsh_common ]; then
     source ~/.config/.zsh_common
@@ -17,7 +21,6 @@ eval "$(starship init zsh)"
 eval "$(zoxide init zsh)"
 alias config='/usr/bin/git --git-dir=$HOME/dotfiles/ --work-tree=$HOME'
 
-# TODO: Check if dependencies are installed, if not - install them
 
 # Install zsh-autosuggestions if not present 
 if [[ ! -d "$HOME/.config/zsh_plugins/zsh-autosuggestions/" ]]; then
@@ -31,3 +34,4 @@ fi
 
 source ~/.config/zsh_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.config/zsh_plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
