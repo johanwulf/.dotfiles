@@ -5,7 +5,6 @@ alias n="nvim ."
 alias src="source ~/.zshrc"
 alias c="clear"
 alias grep="grep --color"
-alias -s {js,scss,html,css,jsx,tsx}=nvim
 alias sed="gsed"
 
 # Replacements
@@ -14,12 +13,6 @@ alias la="exa -a"
 alias ll="exa -al"
 alias cat="bat"
 #alias git="$HOME/.config/git-intercept.sh"
-
-# Utilities
-mkd() {
-    mkdir $1
-    cd $1
-}
 
 # https://github.com/mdumitru/fancy-ctrl-z
 # Used to be able to toggle back and forth between nvim and console
