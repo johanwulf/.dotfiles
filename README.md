@@ -1,15 +1,21 @@
-# Wulf dotfiles
-These are my dotfiles, which are managed by a bare Git repository.
+# dotfiles
 
-[Tutorial for a bare git repository from scratch](https://www.atlassian.com/git/tutorials/dotfiles)
+This repository contains my dotfiles, which are used to customize and configure my development environment, managed by a bare git repository.
 
-Since this repository is already setup, the easiest way to use the following script
+## Installation
 
-[Script link](http://setup.wulf.gg/)  
-To easily setup, do the following
 ```bash
 curl -L setup.wulf.gg >> setup.sh
 chmod +x setup.sh
 ./setup.sh
 ```
-The setup script will download all needed dependencies. It will also remove any files that it would overwrite, and is intended for new machines only. Consider backing up any of the affected files.
+
+The setup script will download any dependencies and set up the dotfiles on your machine. Please note that this script is intended for new machines and may overwrite existing files. Consider backing up any files that may be affected.
+
+## Configuration
+
+The dotfiles in this repository include configurations for various tools and applications. Some of the configurations you can find in this repository include:
+
+- zsh, neovim and tmux configuration
+- shell aliases
+- alacritty terminal customisation
