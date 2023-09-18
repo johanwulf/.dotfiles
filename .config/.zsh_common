@@ -12,6 +12,7 @@ alias ls="exa"
 alias la="exa -a"
 alias ll="exa -al"
 alias cat="bat"
+alias refresh="source $HOME/.zshrc"
 #alias git="$HOME/.config/git-intercept.sh"
 
 # https://github.com/mdumitru/fancy-ctrl-z
