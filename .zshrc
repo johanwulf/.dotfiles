@@ -32,9 +32,14 @@ if [[ ! -d "$HOME/.config/zsh_plugins/zsh-syntax-highlighting/" ]]; then
     git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.config/zsh_plugins/zsh-syntax-highlighting
 fi
 
+# Install zsh-syntax-highlighting if not present 
+if [[ ! -d "$HOME/.config/zsh_plugins/zsh-vi-mode/" ]]; then
+    git clone https://github.com/jeffreytse/zsh-vi-mode ~/.config/zsh_plugins/zsh-vi-mode
+fi
+
 source ~/.config/zsh_plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source ~/.config/zsh_plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-
+source ~/.config/zsh_plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 
 # bun completions
 [ -s "/Users/johan.wulf/.bun/_bun" ] && source "/Users/johan.wulf/.bun/_bun"
