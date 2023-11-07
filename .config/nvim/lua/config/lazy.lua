@@ -13,12 +13,25 @@ require("lazy").setup({
 		-- import any extras modules here
 		{ import = "lazyvim.plugins.extras.lang.typescript" },
 		{ import = "lazyvim.plugins.extras.lang.json" },
-		{ import = "lazyvim.plugins.extras.formatting.prettier" },
 		{ import = "lazyvim.plugins.extras.lang.python" },
-		-- { import = "lazyvim.plugins.extras.ui.mini-animate" },
+		{ import = "lazyvim.plugins.extras.formatting.prettier" },
+		{ import = "lazyvim.plugins.extras.coding.copilot" },
 		-- import/override with your plugins
 		{ "rcarriga/nvim-notify", enabled = false },
+		{ "folke/noice.nvim", enabled = false },
 		{ import = "plugins" },
+		{
+			"sanathks/workspace.nvim",
+			dependencies = { "nvim-telescope/telescope.nvim" },
+			config = function()
+				require("workspace").setup({
+					workspaces = {
+						{ name = "WORK", path = "~/IKEA", keymap = { "<leader>wo" } },
+						{ name = "PERSONAL", path = "~/personal", keymap = { "<leader>pers" } },
+					},
+				})
+			end,
+		},
 	},
 	defaults = {
 		-- By default, only LazyVim plugins will be lazy-loaded. Your custom plugins will load during startup.
