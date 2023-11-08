@@ -1,5 +1,3 @@
 return {
-	{
-		"prettier/vim-prettier",
-	},
+  "prettier/vim-prettier",
 }
