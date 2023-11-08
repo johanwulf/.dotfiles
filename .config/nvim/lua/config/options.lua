@@ -13,9 +13,6 @@ vim.opt.shiftwidth = 4
 vim.opt.autoindent = true
 vim.opt.expandtab = true
 
--- Hide command line when it is unused
-vim.opt.cmdheight = 0
-
 -- Show diagnostics on cursor hold
 vim.api.nvim_create_autocmd("CursorHold", {
 	callback = function()
