@@ -1,8 +1,11 @@
 export EDITOR=nvim 
+export WORK_PATH=$HOME/WORK
+export PERSONAL_PATH=$HOME/personal
+
 alias v="nvim"
 alias vim="nvim"
 alias n="nvim ."
-alias src="source ~/.zshrc"
+alias src="source $HOME/.zshrc"
 alias c="clear"
 alias grep="grep --color"
 alias sed="gsed"
@@ -11,34 +14,25 @@ alias sed="gsed"
 alias ls="exa"
 alias la="exa -a"
 alias ll="exa -al"
-alias cat="bat"
-alias refresh="source $HOME/.zshrc"
-#alias git="$HOME/.config/git-intercept.sh"
 
 # https://github.com/mdumitru/fancy-ctrl-z
-# Used to be able to toggle back and forth between nvim and console
+# Used to be able to toggle back and forth between nvim and terminal 
 fancy-ctrl-z () {
   if [[ $#BUFFER -eq 0 ]]; then
     BUFFER="fg"
     zle accept-line -w
-    c
   else
     zle push-input -w
-    zle clear-screen -w
-    c
   fi
 }
 
 zle -N fancy-ctrl-z
 bindkey ^Z fancy-ctrl-z
 
+# Fuzzy find folders in personal and work directory
 fzf-folder () {
-    cd $(find $HOME/IKEA $HOME/personal $HOME/.config -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) | fzf)
+    cd $(find $WORK_PATH $PERSONAL_PATH $HOME/.config -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) | fzf)
 }
 
 zle -N fzf-folder
 bindkey ^F fzf-folder
-
-autoload edit-command-line
-zle -N edit-command-line
-bindkey -M vicmd v edit-command-line
