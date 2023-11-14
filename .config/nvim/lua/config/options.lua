@@ -13,6 +13,9 @@ vim.opt.shiftwidth = 4
 vim.opt.autoindent = true
 vim.opt.expandtab = true
 
+-- Line length
+vim.opt.colorcolumn = "80"
+
 -- Show diagnostics on cursor hold
 vim.api.nvim_create_autocmd("CursorHold", {
 	callback = function()
