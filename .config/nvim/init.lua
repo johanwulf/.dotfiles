@@ -1,9 +1,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Disable Netrw for nvim-tree
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    https://github.com/folke/lazy.nvim
@@ -46,11 +43,6 @@ require('lazy').setup({
       "nvim-tree/nvim-web-devicons",
       "MunifTanjim/nui.nvim",
     },
-    config = {
-      filesystem = {
-        hijack_netrw_behavior = "open_current"
-      }
-    }
   },
 
   {
@@ -345,7 +337,7 @@ vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc
 vim.keymap.set('n', '<leader>sG', ':LiveGrepGitRoot<cr>', { desc = '[S]earch by [G]rep on Git Root' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
-vim.keymap.set('n', '<leader>e', ':NvimTreeToggle<cr>', { desc = 'Tr[e]e Toggle' })
+vim.keymap.set('n', '<leader>e', ':Neotree toggle<cr>', { desc = 'Tr[e]e Toggle' })
 
 -- Map CTRL + HJKL to switch between windows
 vim.keymap.set('n', '<C-h>', '<C-w>h')
