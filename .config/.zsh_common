@@ -29,7 +29,7 @@ fancy-ctrl-z () {
 zle -N fancy-ctrl-z
 bindkey ^Z fancy-ctrl-z
 
-# Fuzzy find folders in personal and work directory
+# Fuzzy find folders in personal and work directory, and cd into them
 fzf-folder () {
     cd $(find $WORK_PATH $PERSONAL_PATH $HOME/.config -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) | fzf)
     zle accept-line
@@ -37,3 +37,12 @@ fzf-folder () {
 
 zle -N fzf-folder
 bindkey ^F fzf-folder
+
+# Fuzzy find folders and files and open them with nvim
+fzf-nvim () {
+    nvim $(find $WORK_PATH $PERSONAL_PATH $HOME/.config -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) | fzf)
+    zle accept-line
+}
+
+zle -N fzf-nvim
+bindkey ^N fzf-nvim
