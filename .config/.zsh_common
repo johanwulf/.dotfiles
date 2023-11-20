@@ -32,6 +32,7 @@ bindkey ^Z fancy-ctrl-z
 # Fuzzy find folders in personal and work directory
 fzf-folder () {
     cd $(find $WORK_PATH $PERSONAL_PATH $HOME/.config -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) | fzf)
+    zle accept-line
 }
 
 zle -N fzf-folder
