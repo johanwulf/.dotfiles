@@ -18,7 +18,7 @@ alias d='dirs -v'
 for index ({1..9}) alias "$index"="cd +${index}"; unset index
 
 # Alias
-alias c="clear" # Clear terminal
+alias c="clear && printf '\e[3J'" # Clear terminal
 alias src="source ~/.zshenv && source ~/.zshrc" # Refresh zsh configs
 alias ls="ls -G" # Color ls output
 alias la="ls -a" # List all
