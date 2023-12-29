@@ -1,0 +1,13 @@
+#!/bin/bash
+# Kills process running on the provided port
+# USAGE
+#   killport <PORT>
+
+if [ -z "$1" ]
+then
+    echo -e '\033[1mUSAGE\033[0m'
+    echo "  killport <PORT>"
+    exit 1
+fi
+PORT=$1
+lsof -i :$PORT | awk 'NR!=1 {print $2}' | xargs kill -9
