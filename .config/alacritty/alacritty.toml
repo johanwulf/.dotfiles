@@ -64,8 +64,5 @@ hide_when_typing = true
 [selection]
 save_to_clipboard = true
 
-[window]
-decorations = "None"
-
 [window.padding]
 x = 5
