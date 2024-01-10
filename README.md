@@ -3,14 +3,7 @@
 This repository contains my dotfiles, which are used to customize and configure my development environment, managed by a bare git repository.
 
 ## Installation
-
-```bash
-curl -L setup.wulf.gg >> setup.sh
-chmod +x setup.sh
-./setup.sh
-```
-
-The setup script will download any dependencies and set up the dotfiles on your machine. Please note that this script is intended for new machines and may overwrite existing files. Consider backing up any files that may be affected.
+Curl the install file in /bin and run it
 
 ## Configuration
 
