@@ -1,0 +1,11 @@
+sudo pacman -S git gum
+
+git clone --bare git@github.com-personal:johanwulf/dotfiles.git $HOME/.dotfiles
+alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@"
+dotfiles checkout main
+dotfiles config status.showUntrackedFiles no
+dotfiles remote set-url origin git@github.com:johanwulf/.dotfiles.git
+
+sudo pacman -S openssh xorg-init xorg-server neovim alacritty i3 zsh chromium dmenu tmux starship fzf ripgrep fd ttf-jetbrains-mono-nerd xclip polybar discord noto-fonts-emoji
+
+chsh -s $(which zsh)
