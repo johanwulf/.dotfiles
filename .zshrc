@@ -1,3 +1,8 @@
+# load i3 on boot
+if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
+    exec startx &>/dev/null
+fi
+
 # Directory stack
 setopt AUTO_PUSHD
 setopt PUSHD_IGNORE_DUPS
@@ -8,7 +13,7 @@ for index ({1..9}) alias "$index"="cd +${index}"; unset index
 
 # Alias
 alias c="clear && printf '\e[3J'" # Clear terminal
-alias src="source ~/.zshenv && source ~/.zshrc" # Refresh zsh configs
+alias src="source ~/.zshenv && source ~/.zshrc && i3-msg reload && i3-msg restart" # Refresh zsh configs
 alias ls="ls --color" # Color ls output
 alias la="ls -a" # List all
 alias ll="ls -al" # List all in list format
@@ -99,4 +104,4 @@ plugin() {
 plugin "zsh-users/zsh-syntax-highlighting"
 plugin "zsh-users/zsh-autosuggestions"
 
-xset r rate 250 50
+xset r rate 300 50
