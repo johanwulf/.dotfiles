@@ -9,3 +9,4 @@ dotfiles remote set-url origin git@github.com:johanwulf/.dotfiles.git
 pacman -S openssh xorg-init xorg-server neovim alacritty i3 zsh chromium dmenu tmux starship fzf ripgrep fd ttf-jetbrains-mono-nerd xclip polybar discord noto-fonts-emoji --noconfirm
 
 chsh -s $(which zsh)
+github_ssh
