@@ -98,3 +98,5 @@ plugin() {
 
 plugin "zsh-users/zsh-syntax-highlighting"
 plugin "zsh-users/zsh-autosuggestions"
+
+xset r rate 250 50
