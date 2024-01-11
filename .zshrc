@@ -1,13 +1,8 @@
-# Custom plugin manager
-plugin() {
-    PLUGIN_NAME="${1#*/}"
-    [ ! -d "$ZSH_PLUGIN_DIR" ] && mkdir -p $ZSH_PLUGIN_DIR
-    [ ! -f "$ZSH_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" ] && git clone "https://github.com/$1" $ZSH_PLUGIN_DIR/$PLUGIN_NAME
-    source "$ZSH_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh"
-}
-
-plugin "zsh-users/zsh-syntax-highlighting"
-plugin "zsh-users/zsh-autosuggestions"
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    source ~/.zshrc_linux
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    source ~/.zshrc_osx
+fi
 
 # Directory stack
 setopt AUTO_PUSHD
@@ -19,8 +14,6 @@ for index ({1..9}) alias "$index"="cd +${index}"; unset index
 
 # Alias
 alias c="clear && printf '\e[3J'" # Clear terminal
-alias src="source ~/.zshenv && source ~/.zshrc" # Refresh zsh configs
-alias ls="ls -G" # Color ls output
 alias la="ls -a" # List all
 alias ll="ls -al" # List all in list format
 alias ec="nvim ~/.zshrc" # Edit config
@@ -98,3 +91,14 @@ eval "$(starship init zsh)"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Custom plugin manager
+plugin() {
+    PLUGIN_NAME="${1#*/}"
+    [ ! -d "$ZSH_PLUGIN_DIR" ] && mkdir -p $ZSH_PLUGIN_DIR
+    [ ! -f "$ZSH_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" ] && git clone "https://github.com/$1" $ZSH_PLUGIN_DIR/$PLUGIN_NAME
+    source "$ZSH_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh"
+}
+
+plugin "zsh-users/zsh-syntax-highlighting"
+plugin "zsh-users/zsh-autosuggestions"
