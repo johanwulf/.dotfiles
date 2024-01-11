@@ -1,0 +1,6 @@
+if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
+    exec startx &>/dev/null
+fi
+
+alias ls="ls --color"
+alias src="source ~/.zshenv && source ~/.zshrc && i3-msg reload && i3-msg restart"
