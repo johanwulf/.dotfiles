@@ -1,8 +1,20 @@
 #!/bin/bash
 set -e
-FOLDER="$HOME/dotfiles-backup-$(date +%Y-%m-%d_%H-%M-%S)"
-mkdir $FOLDER
-mv ~/.config/ $FOLDER/.config/
-mv ~/.dotfiles/ $FOLDER/.dotfiles/
-mv ~/.hushlogin $FOLDER/.hushlogin
-mv ~/.zshrc $FOLDER/.zshrc
+REPO="https://github.com/johanwulf/.dotfiles.git"
+BACKUP_FOLDER="$HOME/dotfiles-backup-$(date +%Y-%m-%d_%H-%M-%S)"
+
+git clone $REPO temp
+mkdir -p $BACKUP_FOLDER
+FILES=$(cd temp && git ls-files)
+
+for FILE in $FILES
+do
+  ABSOLUTE_FILE_PATH="$HOME/$FILE"
+  if [[ -e $ABSOLUTE_FILE_PATH ]]
+  then
+      mkdir -p "$BACKUP_FOLDER/$(dirname "$FILE")"
+      mv "$ABSOLUTE_FILE_PATH" "$BACKUP_FOLDER/$FILE"
+  fi
+done
+
+rm -rf temp
