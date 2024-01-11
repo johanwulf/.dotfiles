@@ -1,6 +1,7 @@
-# load i3 on boot
-if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
-    exec startx &>/dev/null
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    source ~/.zshrc_linux
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    source ~/.zshrc_osx
 fi
 
 # Directory stack
@@ -13,8 +14,6 @@ for index ({1..9}) alias "$index"="cd +${index}"; unset index
 
 # Alias
 alias c="clear && printf '\e[3J'" # Clear terminal
-alias src="source ~/.zshenv && source ~/.zshrc && i3-msg reload && i3-msg restart" # Refresh zsh configs
-alias ls="ls --color" # Color ls output
 alias la="ls -a" # List all
 alias ll="ls -al" # List all in list format
 alias ec="nvim ~/.zshrc" # Edit config
