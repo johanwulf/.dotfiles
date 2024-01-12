@@ -6,7 +6,7 @@ dotfiles checkout
 dotfiles config status.showUntrackedFiles no
 dotfiles remote set-url origin git@github.com:johanwulf/.dotfiles.git
 
-pacman -S openssh xorg-init xorg-server neovim alacritty i3 zsh chromium dmenu tmux starship fzf ripgrep fd ttf-jetbrains-mono-nerd xclip polybar discord noto-fonts-emoji --noconfirm
+pacman -S openssh xorg-init xorg-server neovim alacritty i3 zsh chromium dmenu tmux starship fzf ripgrep fd ttf-jetbrains-mono-nerd xclip polybar discord noto-fonts-emoji unzip nodejs npm --noconfirm 
 
 chsh -s $(which zsh)
 github_ssh
