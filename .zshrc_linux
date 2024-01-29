@@ -4,5 +4,7 @@ fi
 
 alias ls="ls --color"
 alias src="source ~/.zshenv && source ~/.zshrc && i3-msg reload && i3-msg restart"
+alias kbdus="setxkbmap -layout us"
+alias kbdsv="setxkbmap -layout se"
 
 xset r rate 300 50
