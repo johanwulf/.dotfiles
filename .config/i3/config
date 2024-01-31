@@ -4,6 +4,7 @@ font pango:JetBrainsMono Nerd Font 8
 exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 exec --no-startup-id nm-applet
 exec_always --no-startup-id launch_polybar
+exec_always i3-sensible-terminal
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
