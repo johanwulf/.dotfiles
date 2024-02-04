@@ -13,10 +13,11 @@ alias d='dirs -v'
 for index ({1..9}) alias "$index"="cd +${index}"; unset index
 
 # Alias
-alias c="clear && printf '\e[3J'" # Clear terminal
-alias la="ls -a" # List all
-alias ll="ls -al" # List all in list format
-alias ec="nvim ~/.zshrc" # Edit config
+alias c="clear && printf '\e[3J'"
+alias la="ls -a"
+alias ll="ls -al"
+alias ec="nvim ~/.zshrc"
+alias n="nvim"
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # Functions
