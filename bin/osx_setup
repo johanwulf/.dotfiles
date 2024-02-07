@@ -27,12 +27,15 @@ gum confirm "Do you wish to continue?" && echo "" || exit 0
 gum spin --spinner dot --title "Backing up files..." -- /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/johanwulf/.dotfiles/main/bin/dotfiles_backup)"
 echo "✅ Files backed up"
 
-git clone --bare https://github.com/johanwulf/.dotfiles.git $HOME/.dotfiles
-alias dotfiles=""
-/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ checkout
-/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ config status.showUntrackedFiles no
-/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ remote set-url origin git@github.com:johanwulf/.dotfiles.git
+function clone_dotfiles() {
+  git clone --bare https://github.com/johanwulf/.dotfiles.git $HOME/.dotfiles
+  alias dotfiles=""
+  /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ checkout
+  /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ config status.showUntrackedFiles no
+  /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ remote set-url origin git@github.com:johanwulf/.dotfiles.git
+}
 
+gum spin --spinner dot --title "Backing up files..." -- clone_dotfiles
 echo "✅ Dotfiles cloned"
 
 
