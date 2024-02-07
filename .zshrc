@@ -18,7 +18,7 @@ alias la="ls -a"
 alias ll="ls -al"
 alias ec="nvim ~/.zshrc"
 alias n="nvim"
-alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # Functions
 # Used to be able to toggle back and forth between nvim and terminal 
