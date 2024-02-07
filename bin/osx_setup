@@ -24,8 +24,7 @@ else
 fi
 
 gum confirm "Do you wish to continue?" && echo "" || exit 0
-
-gum spin --spinner dot --title "Backing up files..." -- dotfiles-backup.sh
+gum spin --spinner dot --title "Backing up files..." -- /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/johanwulf/.dotfiles/main/bin/dotfiles_backup)"
 echo "✅ Files backed up"
 
 git clone --bare https://github.com/johanwulf/.dotfiles.git $HOME/.dotfiles
