@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 clear
 echo -e "\033[1;34mjohanwulf setup\033[0m"
 echo ""
