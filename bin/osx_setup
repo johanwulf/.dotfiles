@@ -29,10 +29,10 @@ gum spin --spinner dot --title "Backing up files..." -- dotfiles-backup.sh
 echo "✅ Files backed up"
 
 git clone --bare https://github.com/johanwulf/.dotfiles.git $HOME/.dotfiles
-alias dotfiles="/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@"
-dotfiles checkout
-dotfiles config status.showUntrackedFiles no
-dotfiles remote set-url origin git@github.com:johanwulf/.dotfiles.git
+alias dotfiles=""
+/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ checkout
+/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ config status.showUntrackedFiles no
+/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ remote set-url origin git@github.com:johanwulf/.dotfiles.git
 
 echo "✅ Dotfiles cloned"
 

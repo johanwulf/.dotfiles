@@ -15,6 +15,10 @@ do
       mkdir -p "$BACKUP_FOLDER/$(dirname "$FILE")"
       mv "$ABSOLUTE_FILE_PATH" "$BACKUP_FOLDER/$FILE"
   fi
+  if [[ -e ~/.dotfiles ]]
+  then
+      mv ~/.dotfiles "$BACKUP_FOLDER/.dotfiles"
+  fi
 done
 
 rm -rf temp
