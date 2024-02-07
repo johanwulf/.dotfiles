@@ -107,3 +107,7 @@ save_to_clipboard = true
 
 [window.padding]
 x = 5
+
+[window]
+decorations = "None"
+
