@@ -12,6 +12,7 @@ brew "gh"
 brew "fd"
 brew "bun"
 brew "yarn"
+brew "nvm"
 
 cask "dbeaver-community"
 cask "google-chrome"
