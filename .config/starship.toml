@@ -8,3 +8,4 @@ disabled = true
 
 [cmd_duration]
 disabled = true
+command_timeout = 1000

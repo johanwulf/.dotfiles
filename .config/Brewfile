@@ -11,6 +11,7 @@ brew "ripgrep"
 brew "gh"
 brew "fd"
 brew "bun"
+brew "yarn"
 
 cask "dbeaver-community"
 cask "google-chrome"
