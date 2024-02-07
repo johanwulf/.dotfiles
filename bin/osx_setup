@@ -5,23 +5,34 @@ echo ""
 echo "This script will set up Homebrew, packages and config files"
 echo "If you do not know what you are doing, do not proceed"
 echo " "
+echo -e "\033[1;31mProceeding will install Homebrew and package gum\033[0m"
+echo " "
+read -p "Press enter if you wish to continue"
+echo " "
+echo "Installing Homebrew and gum..."
+
+which -s brew
+
+if [[ $? != 0 ]]; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" > /dev/null
+  echo "✅ Brew installed"
+  brew install gum > /dev/null
+  echo "✅ gum installed"
+else
+  which -s gum
+  if [[ $? != 0 ]]; then
+    brew install gum > /dev/null
+    echo "✅ gum installed"
+  fi
+fi
+
+echo " "
 echo -e "\033[1;31mProceeding with installation will back up and move the following files\033[0m"
 echo "~/.config/*"
 echo "~/.zshrc"
 echo "~/.hushlogin"
 echo "~/.dotfiles/*"
-
-which -s brew
-
-if [[ $? != 0 ]]; then
-  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-	  brew install gum
-else
-  which -s gum
-  if [[ $? != 0 ]]; then
-    brew install gum
-  fi
-fi
+echo " "
 
 gum confirm "Do you wish to continue?" && echo "" || exit 0
 gum spin --spinner dot --title "Backing up files..." -- /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/johanwulf/.dotfiles/main/bin/dotfiles_backup)"
