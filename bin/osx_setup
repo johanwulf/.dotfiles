@@ -40,13 +40,12 @@ echo "✅ Files backed up"
 
 function clone_dotfiles() {
   git clone --bare https://github.com/johanwulf/.dotfiles.git $HOME/.dotfiles
-  alias dotfiles=""
   /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ checkout
   /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ config status.showUntrackedFiles no
   /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ remote set-url origin git@github.com:johanwulf/.dotfiles.git
 }
 
-gum spin --spinner dot --title "Backing up files..." -- clone_dotfiles
+gum spin --spinner dot --title "Backing up files..." -- clone_dotfiles()
 echo "✅ Dotfiles cloned"
 
 
