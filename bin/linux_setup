@@ -1,4 +1,4 @@
-sudo pacman -S git gum openssh xorg-init xorg-server neovim alacritty i3 zsh chromium dmenu tmux starship fzf ripgrep fd ttf-jetbrains-mono-nerd xclip polybar discord noto-fonts-emoji unzip nodejs npm --noconfirm 
+sudo pacman -S git gum openssh xorg-server neovim alacritty i3 zsh chromium dmenu tmux starship fzf ripgrep fd ttf-jetbrains-mono-nerd xclip polybar discord noto-fonts-emoji unzip nodejs npm --noconfirm 
 
 sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/johanwulf/.dotfiles/main/bin/dotfiles_backup)"
 
