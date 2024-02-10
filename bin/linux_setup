@@ -7,5 +7,4 @@ git clone --bare https://github.com/johanwulf/.dotfiles.git $HOME/.dotfiles
 /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ config status.showUntrackedFiles no
 /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ remote set-url origin git@github.com:johanwulf/.dotfiles.git
 
-sudo pacman -S chsh -s $(which zsh)
-github_ssh
+chsh -s $(which zsh)
