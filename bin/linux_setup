@@ -1,6 +1,6 @@
-sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/johanwulf/.dotfiles/main/bin/dotfiles_backup)"
-
 sudo pacman -S git gum openssh xorg-init xorg-server neovim alacritty i3 zsh chromium dmenu tmux starship fzf ripgrep fd ttf-jetbrains-mono-nerd xclip polybar discord noto-fonts-emoji unzip nodejs npm --noconfirm 
+
+sudo /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/johanwulf/.dotfiles/main/bin/dotfiles_backup)"
 
 git clone --bare https://github.com/johanwulf/.dotfiles.git $HOME/.dotfiles
 /usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME $@ checkout
