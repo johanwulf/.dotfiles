@@ -4,14 +4,6 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
     source ~/.zshrc_osx
 fi
 
-# Directory stack
-setopt AUTO_PUSHD
-setopt PUSHD_IGNORE_DUPS
-setopt PUSHD_SILENT
-
-alias d='dirs -v'
-for index ({1..9}) alias "$index"="cd +${index}"; unset index
-
 # Alias
 alias c="clear && printf '\e[3J'"
 alias la="ls -a"
