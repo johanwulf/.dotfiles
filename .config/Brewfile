@@ -13,6 +13,7 @@ brew "fd"
 brew "bun"
 brew "yarn"
 brew "nvm"
+brew "zoxide"
 
 cask "dbeaver-community"
 cask "google-chrome"
