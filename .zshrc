@@ -78,6 +78,9 @@ bindkey ^T fzf-tmux
 # Starship
 eval "$(starship init zsh)"
 
+# Zoxide
+eval "$(zoxide init --cmd cd zsh)"
+
 # bun completions
 [ -s "/Users/johan.wulf/.bun/_bun" ] && source "/Users/johan.wulf/.bun/_bun"
 
