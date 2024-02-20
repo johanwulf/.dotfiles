@@ -1,8 +1,7 @@
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    source ~/.zshrc_linux
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    source ~/.zshrc_osx
-fi
+case "$OSTYPE" in
+    "linux-gnu"*) source ~/.zshrc_linux ;;
+    "darwin"*) source ~/.zshrc_osx ;;
+esac
 
 alias c="clear && printf '\e[3J'"
 alias la="ls -a"
