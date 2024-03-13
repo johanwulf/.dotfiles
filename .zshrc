@@ -20,14 +20,20 @@ fancy-ctrl-z () {
 }
 
 fzf-folder () {
-    cd $(find $WORK_PATH $PERSONAL_PATH $CONFIG_PATH -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
-    sleep 0.1
-    zle accept-line
+    selected=$(find $WORK_PATH $PERSONAL_PATH $CONFIG_PATH -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
+    if [[ $selected ]]; then
+        cd $selected
+        sleep 0.1
+        zle accept-line
+    fi
 }
 
 fzf-nvim () {
-    nvim $(find $WORK_PATH $PERSONAL_PATH $CONFIG_PATH -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
-    zle accept-line
+    selected=$(find $WORK_PATH $PERSONAL_PATH $CONFIG_PATH -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
+    if [[ $selected ]]; then
+        nvim $selected
+        zle accept-line
+    fi
 }
 
 fzf-tmux () {
