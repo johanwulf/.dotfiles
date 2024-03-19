@@ -126,6 +126,8 @@ require('lazy').setup {
     },
   },
 
+  { 'mfussenegger/nvim-jdtls' },
+
   -- Show pending keybinds
   {
     'folke/which-key.nvim',
@@ -290,6 +292,7 @@ require('lazy').setup {
         clangd = {},
         pyright = {},
         tsserver = {},
+        jdtls = {},
         lua_ls = {
           settings = {
             Lua = {
@@ -453,7 +456,7 @@ require('lazy').setup {
 
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc' },
+        ensure_installed = { 'bash', 'c', 'html', 'lua', 'markdown', 'vim', 'vimdoc', 'java' },
         auto_install = true,
         highlight = { enable = true },
         indent = { enable = true },
