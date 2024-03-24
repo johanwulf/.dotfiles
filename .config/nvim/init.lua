@@ -109,6 +109,9 @@ require('lazy').setup {
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
+  -- Prettier
+  'prettier/vim-prettier',
+
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
@@ -340,12 +343,14 @@ require('lazy').setup {
       notify_on_error = false,
       format_on_save = {
         timeout_ms = 500,
-        lsp_fallback = true,
+        lsp_fallback = false,
       },
       formatters_by_ft = {
         lua = { 'stylua' },
-        javascript = { { 'prettierd', 'prettier' } },
-        typescript = { { 'prettierd', 'prettier' } },
+        javascript = { 'prettier' },
+        typescript = { 'prettier' },
+        tsx = { 'prettier' },
+        jsx = { 'prettier' },
       },
     },
   },
