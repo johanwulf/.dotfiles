@@ -91,3 +91,5 @@ plugin "zsh-users/zsh-autosuggestions"
 
 # bun completions
 [ -s "/home/wulf/.bun/_bun" ] && source "/home/wulf/.bun/_bun"
+
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
