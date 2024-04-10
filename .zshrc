@@ -19,7 +19,8 @@ fancy-ctrl-z () {
     fi
 }
 
-fzf-folder () {
+# fuzzy folder
+ff () {
     selected=$(find $WORK_PATH $PERSONAL_PATH $CONFIG_PATH -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
     if [[ $selected ]]; then
         cd $selected
@@ -28,7 +29,8 @@ fzf-folder () {
     fi
 }
 
-fzf-nvim () {
+# fuzzy nvim
+fn () {
     selected=$(find $WORK_PATH $PERSONAL_PATH $CONFIG_PATH -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
     if [[ $selected ]]; then
         nvim $selected
@@ -36,7 +38,8 @@ fzf-nvim () {
     fi
 }
 
-fzf-tmux () {
+# fuzzy tmux
+ft () {
     if [[ $# -eq 1 ]]; then
         selected=$1
     else
@@ -65,14 +68,14 @@ fzf-tmux () {
 zle -N fancy-ctrl-z
 bindkey ^Z fancy-ctrl-z
 
-zle -N fzf-nvim
-bindkey ^N fzf-nvim
+zle -N fn
+bindkey ^N fn
 
-zle -N fzf-folder
-bindkey ^F fzf-folder
+zle -N ff
+bindkey ^F ff
 
-zle -N fzf-tmux
-bindkey ^T fzf-tmux
+zle -N ft
+bindkey ^T ft
 
 eval "$(starship init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
@@ -88,8 +91,3 @@ plugin() {
 
 plugin "zsh-users/zsh-syntax-highlighting"
 plugin "zsh-users/zsh-autosuggestions"
-
-# bun completions
-[ -s "/home/wulf/.bun/_bun" ] && source "/home/wulf/.bun/_bun"
-
-export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
