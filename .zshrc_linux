@@ -8,3 +8,5 @@ alias kbdus="setxkbmap -layout us"
 alias kbdsv="setxkbmap -layout se"
 
 xset r rate 300 50
+
+[ -s "/home/wulf/.bun/_bun" ] && source "/home/wulf/.bun/_bun"

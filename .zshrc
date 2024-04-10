@@ -80,7 +80,6 @@ bindkey ^T ft
 eval "$(starship init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
-[ -s "/Users/johan.wulf/.bun/_bun" ] && source "/Users/johan.wulf/.bun/_bun"
 
 plugin() {
     PLUGIN_NAME="${1#*/}"
