@@ -10,7 +10,7 @@ alias ec="nvim ~/.zshrc"
 alias n="nvim"
 alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
-fancy-ctrl-z () {
+ctrlz () {
     if [[ $#BUFFER -eq 0 ]]; then
         BUFFER="fg"
         zle accept-line -w
@@ -65,8 +65,8 @@ ft () {
     tmux switch-client -t $selected_name
 }
 
-zle -N fancy-ctrl-z
-bindkey ^Z fancy-ctrl-z
+zle -N ctrlz
+bindkey ^Z ctrlz
 
 zle -N fn
 bindkey ^N fn
