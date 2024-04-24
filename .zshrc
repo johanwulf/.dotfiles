@@ -9,6 +9,7 @@ alias ec="nvim ~/.zshrc"
 alias n="nvim"
 alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias src="source ~/.zshenv && source ~/.zshrc"
+alias history="history 1"
 
 # ================================================================== #
 # CTRL + Z to tab in and out of current buffer                       #
@@ -85,6 +86,30 @@ ft () {
 
 zle -N ft
 bindkey ^T ft
+
+# ================================================================== #
+# CTRL + H to fuzzy find zsh history                                 #
+# ================================================================== #
+fh() {
+    history | fzf | xargs -I {} bash -c '{}'
+}
+
+zle -N fh
+bindkey ^H fh
+
+# ================================================================== #
+# History                                                            #
+# ================================================================== #
+export HISTSIZE=100000
+export SAVEHIST=100000
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_SAVE_NO_DUPS
+setopt SHARE_HISTORY
 
 # ================================================================== #
 # Exports, paths and stuff                                           #
