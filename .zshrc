@@ -1,14 +1,11 @@
-case "$OSTYPE" in
-    "linux-gnu"*) source ~/.zshrc_linux ;;
-    "darwin"*) source ~/.zshrc_osx ;;
-esac
-
 alias c="clear && printf '\e[3J'"
+alias ls="ls -G"
 alias la="ls -a"
 alias ll="ls -al"
 alias ec="nvim ~/.zshrc"
 alias n="nvim"
 alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias src="source ~/.zshenv && source ~/.zshrc"
 
 ctrlz () {
     if [[ $#BUFFER -eq 0 ]]; then
@@ -77,9 +74,26 @@ bindkey ^F ff
 zle -N ft
 bindkey ^T ft
 
+export NVM_DIR="$HOME/.nvm"
+    [ -s "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" ] && \. "$HOMEBREW_PREFIX/opt/nvm/nvm.sh" # This loads nvm
+    [ -s "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm" # This loads nvm bash_completion
+
+export SDKMAN_DIR="$HOME/.sdkman"
+    [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# bun completions
+[ -s "/Users/johan.wulf/.bun/_bun" ] && source "/Users/johan.wulf/.bun/_bun"
+
 eval "$(starship init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
+# psql
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+
+# gcloud
+source "$(brew --prefix)/share/google-cloud-sdk/path.zsh.inc"
+source "$(brew --prefix)/share/google-cloud-sdk/completion.zsh.inc"
 
 plugin() {
     PLUGIN_NAME="${1#*/}"
