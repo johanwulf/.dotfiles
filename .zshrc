@@ -31,7 +31,7 @@ bindkey ^Z ctrlz
 # CTRL + F to fuzzy find folders in selected paths, cd into it       #
 # ================================================================== #
 ff () {
-    selected=$(find $WORK_PATH $PERSONAL_PATH $CONFIG_PATH -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
+    selected=$(find $REPOS_PATH $CONFIG_PATH -type d -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
     if [[ $selected ]]; then
         cd $selected
         sleep 0.1
@@ -46,7 +46,7 @@ bindkey ^F ff
 # CTRL + N to fuzzy find in selected paths, open with nvim           #
 # ================================================================== #
 fn () {
-    selected=$(find $WORK_PATH $PERSONAL_PATH $CONFIG_PATH -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
+    selected=$(find $REPOS_PATH $CONFIG_PATH -not \( -path "*/.git" -prune \) -not \( -path "*/node_modules" -prune \) -not \( -path "*/zsh_plugins" -prune \) | fzf)
     if [[ $selected ]]; then
         nvim $selected
         zle accept-line
@@ -63,7 +63,7 @@ ft () {
     if [[ $# -eq 1 ]]; then
         selected=$1
     else
-        selected=$(find $WORK_PATH $PERSONAL_PATH $CONFIG_PATH ~ -mindepth 0 -maxdepth 1 | fzf)
+        selected=$(find $REPOS_PATH $CONFIG_PATH ~ -mindepth 0 -maxdepth 1 | fzf)
     fi
 
     if [[ -z $selected ]]; then
