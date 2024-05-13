@@ -92,7 +92,8 @@ bindkey ^T ft
 # CTRL + H to fuzzy find zsh history                                 #
 # ================================================================== #
 fh() {
-    history | fzf | xargs -I {} bash -c '{}'
+    print -z $(history | sed -re 's/ *[0-9]* *//' | fzf)
+    zle accept-line
 }
 
 zle -N fh
