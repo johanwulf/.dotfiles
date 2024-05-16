@@ -19,4 +19,7 @@ return {
       vim.keymap.set('n', '<space>-', require('oil').toggle_float)
     end,
   },
+  'tpope/vim-dadbod',
+  'kristijanhusak/vim-dadbod-completion',
+  'kristijanhusak/vim-dadbod-ui',
 }
