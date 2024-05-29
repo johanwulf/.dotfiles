@@ -142,15 +142,26 @@ done
 # ================================================================== #
 # zsh plugin manager                                                 #
 # ================================================================== #
-plugin() {
+zsh_plugin() {
     PLUGIN_NAME="${1#*/}"
     [ ! -d "$ZSH_PLUGIN_DIR" ] && mkdir -p $ZSH_PLUGIN_DIR
     [ ! -f "$ZSH_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" ] && git clone "https://github.com/$1" $ZSH_PLUGIN_DIR/$PLUGIN_NAME
     source "$ZSH_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh"
 }
 
-plugin "zsh-users/zsh-syntax-highlighting"
-plugin "zsh-users/zsh-autosuggestions"
+zsh_plugin "zsh-users/zsh-syntax-highlighting"
+zsh_plugin "zsh-users/zsh-autosuggestions"
+
+# ================================================================== #
+# zsh plugin manager                                                 #
+# ================================================================== #
+tmux_plugin() {
+    PLUGIN_NAME="${1#*/}"
+    [ ! -d "$TMUX_PLUGIN_DIR" ] && mkdir -p $TMUX_PLUGIN_DIR
+    [ ! -f "$TMUX_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME" ] && git clone "https://github.com/$1" $TMUX_PLUGIN_DIR/$PLUGIN_NAME
+}
+
+tmux_plugin "tmux-plugins/tpm"
 
 # ================================================================== #
 # Evals                                                              #
