@@ -11,6 +11,7 @@ alias n="nvim"
 alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias src="source ~/.zshenv && source ~/.zshrc"
 alias history="history 1"
+alias docker=podman
 
 # ================================================================== #
 # CTRL + Z to tab in and out of current buffer                       #
