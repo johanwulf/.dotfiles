@@ -1,4 +1,3 @@
-
 # ================================================================== #
 # Aliases                                                            #
 # ================================================================== #
@@ -121,25 +120,6 @@ export NVM_DIR="$HOME/.nvm"
 export SDKMAN_DIR="$HOME/.sdkman"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
-# ================================================================== #
-# Sourcing                                                           #
-# ================================================================== #
-files_to_source=(
- "$HOME/.sdkman/bin/sdkman-init.sh"
- "$HOMEBREW_PREFIX/opt/nvm/nvm.sh"
- "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
- "$HOMEBREW_PREFIX/share/google-cloud-sdk/path.zsh.inc"
- "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.zsh.inc"
- "$HOME/.zshsecret"
-)
-
-for file in "${files_to_source[@]}"; do
- if [ -s "$file" ]; then
-    source "$file"
- else
-    echo "Could not find $file"
- fi
-done
 
 # ================================================================== #
 # zsh plugin manager                                                 #
@@ -153,6 +133,17 @@ zsh_plugin() {
 
 zsh_plugin "zsh-users/zsh-syntax-highlighting"
 zsh_plugin "zsh-users/zsh-autosuggestions"
+zsh_plugin "qoomon/zsh-lazyload"
+
+# ================================================================== #
+# Sourcing                                                           #
+# ================================================================== #
+lazyload sdk -- "source $HOME/.sdkman/bin/sdkman-init.sh"
+lazyload nvm -- "source $HOMEBREW_PREFIX/opt/nvm/nvm.sh"
+lazyload gcloud -- "source $HOMEBREW_PREFIX/share/google-cloud-sdk/path.zsh.inc"
+lazyload -- source "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.zsh.inc"
+lazyload -- source "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
+source "$HOME/.zshsecret"
 
 # ================================================================== #
 # zsh plugin manager                                                 #
