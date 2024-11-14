@@ -399,6 +399,19 @@ require('lazy').setup {
     },
   },
 
+  -- tmux workspaces
+  {
+    'sanathks/workspace.nvim',
+    dependencies = { 'nvim-telescope/telescope.nvim' },
+    config = function()
+      require('workspace').setup {
+        workspaces = {
+          { name = 'Repos', path = '~/repos', keymap = { '<leader>to' } },
+        },
+      }
+    end,
+  },
+
   -- Autocompletion
   {
     'hrsh7th/nvim-cmp',
@@ -516,3 +529,6 @@ require('lazy').setup {
 
   { import = 'custom.plugins' },
 }
+
+local workspace = require 'workspace'
+vim.keymap.set('n', '<leader>t', workspace.tmux_sessions)
