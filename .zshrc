@@ -130,6 +130,7 @@ files_to_source=(
  "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
  "$HOMEBREW_PREFIX/share/google-cloud-sdk/path.zsh.inc"
  "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.zsh.inc"
+ "$HOME/.zshsecret"
 )
 
 for file in "${files_to_source[@]}"; do
