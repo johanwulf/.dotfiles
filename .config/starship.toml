@@ -1,11 +1,8 @@
-"$schema" = 'https://starship.rs/config-schema.json'
-
-[gcloud]
-disabled = true
-
-[lua]
-disabled = true
-
-[cmd_duration]
-disabled = true
-command_timeout = 10000
+format = """
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$line_break\
+$character
+"""
