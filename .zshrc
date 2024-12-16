@@ -9,8 +9,9 @@ alias ec="nvim ~/.zshrc"
 alias n="nvim"
 alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias src="source ~/.zshenv && source ~/.zshrc"
+alias docker="podman"
+alias gspp="git stash && git pull && git stash pop" # (g)it (s)tash (p)ull (p)op
 alias history="history 1"
-alias docker=podman
 
 # ================================================================== #
 # CTRL + Z to tab in and out of current buffer                       #
@@ -119,7 +120,6 @@ setopt SHARE_HISTORY
 export NVM_DIR="$HOME/.nvm"
 export SDKMAN_DIR="$HOME/.sdkman"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
-
 
 # ================================================================== #
 # zsh plugin manager                                                 #
