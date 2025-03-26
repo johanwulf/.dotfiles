@@ -75,6 +75,13 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- Keybinds to make it easier to work with LLMs
+vim.keymap.set('n', '<leader>cp', function()
+  local path = vim.fn.expand '%:p'
+  vim.fn.setreg('+', path)
+  vim.notify('Copied: ' .. path, vim.log.levels.INFO)
+end, { desc = '[C]opy [P]ath of current buffer' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -211,6 +218,8 @@ require('lazy').setup {
         defaults = {
           file_ignore_patterns = {
             'package%-lock.json',
+            'tsconfig.json',
+            'jest.config.ts',
           },
         },
         extensions = {

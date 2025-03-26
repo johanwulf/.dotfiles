@@ -100,6 +100,9 @@ fh() {
 zle -N fh
 bindkey ^H fh
 
+bindkey "^[[A" history-search-backward
+bindkey "^[[B" history-search-forward
+
 # ================================================================== #
 # History                                                            #
 # ================================================================== #
@@ -133,6 +136,7 @@ zsh_plugin() {
 
 zsh_plugin "zsh-users/zsh-syntax-highlighting"
 zsh_plugin "zsh-users/zsh-autosuggestions"
+zsh_plugin "jeffreytse/zsh-vi-mode"
 zsh_plugin "qoomon/zsh-lazyload"
 
 # ================================================================== #
@@ -162,3 +166,6 @@ tmux_plugin "tmux-plugins/tpm"
 eval "$(/opt/homebrew/bin/brew shellenv)"
 eval "$(starship init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
+
+export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
+export PATH=$JAVA_HOME/bin:$PATH
