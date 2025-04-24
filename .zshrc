@@ -169,3 +169,11 @@ eval "$(zoxide init --cmd cd zsh)"
 
 export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
 export PATH=$JAVA_HOME/bin:$PATH
+
+# pnpm
+export PNPM_HOME="/Users/johan.wulf/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
