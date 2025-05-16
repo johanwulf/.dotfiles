@@ -5,8 +5,6 @@ alias c="clear && printf '\e[3J'"
 alias ls="ls -G"
 alias la="ls -a"
 alias ll="ls -al"
-alias ec="nvim ~/.zshrc"
-alias n="nvim"
 alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias src="source ~/.zshenv && source ~/.zshrc"
 alias docker="podman"
