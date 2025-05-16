@@ -20,6 +20,7 @@ which -s brew
 
 if [[ $? != 0 ]]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" > /dev/null
+  eval "$(/opt/homebrew/bin/brew shellenv)"
   echo "✅ Brew installed"
   brew install gum > /dev/null
   echo "✅ gum installed"
@@ -56,6 +57,9 @@ echo "✅ brew upgraded"
 gum spin --spinner dot --title "Installing brew bundle packages..." -- brew bundle --file=$HOME/.config/Brewfile
 echo "✅ brew packages installed"
 
+nvm install --lts
+nvm use --lts
+
 echo "✅ Updating macOS settings"
 
 defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
@@ -69,8 +73,18 @@ defaults write com.apple.finder "AppleShowAllFiles" -bool "false"
 defaults write com.apple.finder "FXEnableExtensionChangeWarning" -bool "false"
 defaults write NSGlobalDomain _HIHideMenuBar -bool true
 defaults write com.apple.dock "mru-spaces" -bool "false"
+defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
+defaults write com.apple.finder "AppleShowAllFiles" -bool "true"
+defaults write com.apple.screencapture "disable-shadow" -bool "true"
+sudo defaults write com.apple.universalaccess reduceMotion -bool true
+sudo defaults write com.apple.Accessibility ReduceMotionEnabled -bool true
+hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x700000029}]}'
 
 killall Finder
 killall Dock
 
 echo "Done!"
+
+echo "Remember to set reduced motion"
+echo "Remember to set key repeat"
+echo "Remember to set desktop keybinds"
