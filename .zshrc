@@ -8,6 +8,7 @@ alias ll="ls -al"
 alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias src="source ~/.zshenv && source ~/.zshrc"
 alias docker="podman"
+alias "docker-compose"="podman-compose"
 alias gspp="git stash && git pull && git stash pop" # (g)it (s)tash (p)ull (p)op
 alias history="history 1"
 
