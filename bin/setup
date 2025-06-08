@@ -60,6 +60,32 @@ echo "✅ brew packages installed"
 nvm install --lts
 nvm use --lts
 
+echo "✅ Setting up 1Password SSH integration"
+echo ""
+echo "Please complete the following steps:"
+echo "1. Open 1Password and sign in"
+echo "2. Go to 1Password Settings > Developer"
+echo "3. Enable 'Use the SSH agent'"
+echo "4. Enable 'Integrate with 1Password CLI'"
+echo ""
+gum confirm "Have you completed these steps?" || exit 1
+
+if op account list &>/dev/null; then
+    echo "✅ 1Password CLI is already authenticated"
+else
+    echo "Please sign in to 1Password CLI:"
+    eval $(op signin)
+fi
+
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+
+echo "Host *
+    IdentityAgent \"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\"" > ~/.ssh/config
+chmod 600 ~/.ssh/config
+
+echo "✅ 1Password SSH agent configured"
+
 echo "✅ Updating macOS settings"
 
 defaults write -g NSAutomaticPeriodSubstitutionEnabled -bool false
@@ -76,16 +102,57 @@ defaults write com.apple.dock "mru-spaces" -bool "false"
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 defaults write com.apple.finder "AppleShowAllFiles" -bool "true"
 defaults write com.apple.screencapture "disable-shadow" -bool "true"
-sudo defaults write com.apple.universalaccess reduceMotion -bool true
-sudo defaults write com.apple.Accessibility ReduceMotionEnabled -bool true
+
+# Reduce motion
+defaults write com.apple.universalaccess reduceMotion -bool true
+defaults write com.apple.Accessibility ReduceMotionEnabled -bool true
+
+# Key repeat settings
+defaults write -g KeyRepeat -int 1
+defaults write -g InitialKeyRepeat -int 10
+
+# Trackpad right-click in bottom corner
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
+defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
+defaults -currentHost write NSGlobalDomain com.apple.trackpad.trackpadCornerClickBehavior -int 1
+defaults -currentHost write NSGlobalDomain com.apple.trackpad.enableSecondaryClick -bool true
+
+# Show Bluetooth in menu bar
+defaults write com.apple.controlcenter "NSStatusItem Visible Bluetooth" -bool true
+defaults write com.apple.systemuiserver menuExtras -array-add "/System/Library/CoreServices/Menu Extras/Bluetooth.menu" 2>/dev/null || true
+
+# Show full path in Finder title
+defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
+
+# Show battery percentage
+defaults write com.apple.menuextra.battery ShowPercent -bool true
+
+# Screenshots to clipboard by default
+defaults write com.apple.screencapture target -string "clipboard"
+
+# Disable hot corners
+defaults write com.apple.dock wvous-tl-corner -int 0
+defaults write com.apple.dock wvous-tr-corner -int 0
+defaults write com.apple.dock wvous-bl-corner -int 0
+defaults write com.apple.dock wvous-br-corner -int 0
+
+# Disable startup sound
+sudo nvram StartupMute=%01
+
+# Caps Lock to Escape
 hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x700000029}]}'
+
+bash ~/bin/create-finder-terminal-service.sh 2>/dev/null || true
 
 killall Finder
 killall Dock
 
-echo "Done!"
+echo ""
+echo "🎆 Setting up desktop spaces..."
+gum confirm "Ready to set up 7 desktop spaces with your applications?" && bash ~/bin/setup-spaces.sh || echo "⚠️  Skipping space setup"
 
-echo "Remember to set reduced motion"
-echo "Remember to set key repeat"
-echo "Remember to set desktop keybinds"
-echo "Remember to set right click bottom left trackpad"
+echo ""
+echo "🎉 Setup complete!"
+echo ""
+
+gum confirm "Restart now to apply all settings?" && sudo shutdown -r now || echo "Remember to restart later for all settings to take effect"
