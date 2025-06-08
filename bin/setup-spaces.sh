@@ -127,6 +127,19 @@ END
 echo ""
 gum confirm "This will create 7 desktop spaces and assign your apps. Continue?" || exit 0
 
+echo "Opening all applications..."
+APPS=("Alacritty" "Google Chrome" "Claude" "Microsoft Teams" "Discord" "Todoist" "Slack" "DBeaver" "Spotify")
+
+for app in "${APPS[@]}"; do
+    if check_app "$app"; then
+        echo "  Opening $app..."
+        open -a "$app"
+    fi
+done
+
+echo "Waiting for apps to launch..."
+sleep 5
+
 create_spaces
 echo "✅ Desktop spaces created"
 
