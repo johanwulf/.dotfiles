@@ -20,14 +20,20 @@ which -s brew
 
 if [[ $? != 0 ]]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" > /dev/null
-  eval "$(/opt/homebrew/bin/brew shellenv)"
+  
+  # Add Homebrew to PATH for Apple Silicon Macs
+  if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
+  
   echo "✅ Brew installed"
-  brew install gum > /dev/null
+  brew install gum jq > /dev/null
   echo "✅ gum installed"
 else
   which -s gum
   if [[ $? != 0 ]]; then
-    brew install gum > /dev/null
+    brew install gum jq > /dev/null
     echo "✅ gum installed"
   fi
 fi
@@ -57,57 +63,11 @@ echo "✅ brew upgraded"
 gum spin --spinner dot --title "Installing brew bundle packages..." -- brew bundle --file=$HOME/.config/Brewfile
 echo "✅ brew packages installed"
 
+# Fix for nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
 nvm install --lts
 nvm use --lts
-
-echo "✅ Setting up 1Password SSH integration"
-echo ""
-echo "Please complete the following steps:"
-echo "1. Open 1Password and sign in"
-echo "2. Go to 1Password Settings > Developer"
-echo "3. Enable 'Use the SSH agent'"
-echo "4. Enable 'Integrate with 1Password CLI'"
-echo ""
-gum confirm "Have you completed these steps?" || exit 1
-
-if op account list &>/dev/null; then
-    echo "✅ 1Password CLI is already authenticated"
-else
-    echo "Please sign in to 1Password CLI:"
-    eval $(op signin)
-fi
-
-mkdir -p ~/.ssh
-chmod 700 ~/.ssh
-
-echo "Host *
-    IdentityAgent \"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\"" > ~/.ssh/config
-chmod 600 ~/.ssh/config
-
-echo "✅ 1Password SSH agent configured"
-
-echo "Fetching SSH keys from 1Password..."
-
-SSH_KEYS=$(op item list --categories "SSH Key" --format json | jq -r '.[].title')
-
-if [[ -n "$SSH_KEYS" ]]; then
-    KEY_NAME=$(echo "$SSH_KEYS" | gum choose --header "Select SSH key to download:")
-    if [[ -n "$KEY_NAME" ]]; then
-        echo "Using SSH key: $KEY_NAME"
-        op read "op://Private/$KEY_NAME/private key" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        op read "op://Private/$KEY_NAME/public key" > ~/.ssh/id_ed25519.pub
-        chmod 644 ~/.ssh/id_ed25519.pub
-        echo "✅ SSH keys downloaded from 1Password"
-    else
-        echo "⚠️  No key selected"
-    fi
-else
-    echo "⚠️  No SSH keys found in 1Password"
-    echo "You can either:"
-    echo "1. Use 1Password's SSH agent (already configured above)"
-    echo "2. Generate a new key: ssh-keygen -t ed25519 -C \"your.email@example.com\""
-fi
 
 echo "✅ Updating macOS settings"
 
@@ -130,7 +90,6 @@ defaults write com.apple.dock persistent-apps -array
 defaults write com.apple.dock persistent-others -array
 
 # Reduce motion
-defaults write com.apple.universalaccess reduceMotion -bool true
 defaults write com.apple.Accessibility ReduceMotionEnabled -bool true
 
 # Key repeat settings
@@ -143,15 +102,14 @@ defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightC
 defaults -currentHost write NSGlobalDomain com.apple.trackpad.trackpadCornerClickBehavior -int 1
 defaults -currentHost write NSGlobalDomain com.apple.trackpad.enableSecondaryClick -bool true
 
-# Show Bluetooth in menu bar
-defaults write com.apple.controlcenter "NSStatusItem Visible Bluetooth" -bool true
-defaults write com.apple.systemuiserver menuExtras -array-add "/System/Library/CoreServices/Menu Extras/Bluetooth.menu" 2>/dev/null || true
+# Show Bluetooth in menu bar (for macOS Ventura and later)
+defaults -currentHost write com.apple.controlcenter Bluetooth -int 18
 
 # Show full path in Finder title
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
 # Show battery percentage
-defaults write com.apple.menuextra.battery ShowPercent -bool true
+defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter.plist BatteryShowPercentage -bool true
 
 # Screenshots to clipboard by default
 defaults write com.apple.screencapture target -string "clipboard"
@@ -163,15 +121,22 @@ defaults write com.apple.dock wvous-bl-corner -int 0
 defaults write com.apple.dock wvous-br-corner -int 0
 
 # Disable startup sound
-sudo nvram StartupMute=%01
+sudo nvram SystemAudioVolume=" "
 
 # Caps Lock to Escape
 hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x700000029}]}'
+
+# Allow apps from unidentified developers
+sudo spctl --master-disable
+
+# Create .zshsecret if it doesn't exist
+touch ~/.zshsecret
 
 bash ~/bin/create-finder-terminal-service.sh 2>/dev/null || true
 
 killall Finder
 killall Dock
+killall SystemUIServer
 
 echo ""
 echo "🎆 Setting up desktop spaces..."
