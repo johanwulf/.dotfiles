@@ -91,16 +91,21 @@ echo "Fetching SSH keys from 1Password..."
 SSH_KEYS=$(op item list --categories "SSH Key" --format json | jq -r '.[].title')
 
 if [[ -n "$SSH_KEYS" ]]; then
-    KEY_NAME=$(echo "$SSH_KEYS" | gum choose --header "Select SSH key to download:")
-    if [[ -n "$KEY_NAME" ]]; then
+    if echo "$SSH_KEYS" | grep -q "GitHub"; then
+        KEY_NAME="GitHub"
         echo "Using SSH key: $KEY_NAME"
+        
         op read "op://Private/$KEY_NAME/private key" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
+        
         op read "op://Private/$KEY_NAME/public key" > ~/.ssh/id_ed25519.pub
         chmod 644 ~/.ssh/id_ed25519.pub
+        
         echo "✅ SSH keys downloaded from 1Password"
     else
-        echo "⚠️  No key selected"
+        echo "⚠️  GitHub SSH key not found in 1Password"
+        echo "Available keys:"
+        echo "$SSH_KEYS"
     fi
 else
     echo "⚠️  No SSH keys found in 1Password"
@@ -120,11 +125,14 @@ defaults write com.apple.dock "static-only" -bool "true"
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 defaults write com.apple.finder "AppleShowAllFiles" -bool "false"
 defaults write com.apple.finder "FXEnableExtensionChangeWarning" -bool "false"
-defaults write NSGlobalDomain _HIHideMenuBar -bool true
 defaults write com.apple.dock "mru-spaces" -bool "false"
 defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 defaults write com.apple.finder "AppleShowAllFiles" -bool "true"
 defaults write com.apple.screencapture "disable-shadow" -bool "true"
+
+# Remove all dock icons (only show running apps)
+defaults write com.apple.dock persistent-apps -array
+defaults write com.apple.dock persistent-others -array
 
 # Reduce motion
 defaults write com.apple.universalaccess reduceMotion -bool true
