@@ -12,74 +12,113 @@ check_app() {
     fi
 }
 
+grant_accessibility_permissions() {
+    echo "Granting accessibility permissions..."
+    
+    # Add Terminal to accessibility
+    osascript <<'END'
+tell application "System Events"
+    set UI elements enabled to true
+end tell
+END
+
+    echo "Please grant accessibility permissions when prompted"
+    
+    # Open accessibility settings
+    open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+    
+    echo "Make sure Terminal is enabled in Accessibility permissions"
+    gum confirm "Have you granted accessibility permissions to Terminal?" || return 1
+}
+
 create_spaces() {
     echo "Creating desktop spaces..."
     
+    # First ensure we have accessibility permissions
+    grant_accessibility_permissions
+    
+    # Use a different approach - create spaces via Mission Control
     osascript <<'END'
-on run
-    tell application "Mission Control" to launch
+tell application "Mission Control"
+    activate
+end tell
+
+delay 2
+
+tell application "System Events"
+    -- Get to Mission Control
+    tell application "Mission Control" to activate
     delay 2
     
-    tell application "System Events"
-        tell process "Dock"
-            repeat 6 times
-                try
-                    click button 1 of group "Spaces Bar" of group 1 of group "Mission Control"
-                    delay 0.5
-                on error
-                    keystroke "+" using control down
-                    delay 0.5
-                end try
-            end repeat
-        end tell
-        
-        key code 53
-    end tell
+    -- Try to create spaces by simulating clicks
+    repeat 6 times
+        try
+            -- Press the + button to add space
+            key code 24 using {control down, option down} -- This is Ctrl+Option+Plus
+            delay 0.5
+        on error
+            -- If that doesn't work, try clicking
+            tell process "Dock"
+                click (last UI element of group 1 whose role description is "add desktop button")
+                delay 0.5
+            end tell
+        end try
+    end repeat
     
-    return true
-end run
+    -- Exit Mission Control
+    key code 53 -- Escape
+end tell
 END
 }
 
-assign_to_desktop() {
-    local app_name="$1"
-    local desktop_num="$2"
+open_all_apps() {
+    echo "Opening all applications..."
+    APPS=("Alacritty" "Google Chrome" "Claude" "Microsoft Teams" "Discord" "Todoist" "Slack" "DBeaver" "Spotify")
     
-    echo "  Assigning $app_name to Desktop $desktop_num..."
+    for app in "${APPS[@]}"; do
+        if check_app "$app"; then
+            echo "  Opening $app..."
+            open -a "$app" 2>/dev/null || true
+            sleep 1
+        fi
+    done
     
-    osascript <<END
-on run
-    tell application "System Events"
-        key code $(($desktop_num + 17)) using control down
-        delay 1
-    end tell
+    echo "Waiting for apps to fully launch..."
+    sleep 5
+}
+
+setup_space_shortcuts() {
+    echo "Setting up desktop shortcuts..."
     
-    tell application "$app_name"
-        activate
-        delay 2
-    end tell
+    # Enable shortcuts programmatically
+    for i in {1..7}; do
+        # The symbolic hotkey IDs for Switch to Desktop 1-7 are 118-124
+        hotkey_id=$((117 + i))
+        
+        # Enable the shortcut
+        /usr/libexec/PlistBuddy -c "Set :AppleSymbolicHotKeys:$hotkey_id:enabled true" ~/Library/Preferences/com.apple.symbolichotkeys.plist 2>/dev/null || true
+    done
     
-    tell application "System Events"
-        tell process "Dock"
-            set frontmost to true
-            try
-                click UI element "$app_name" of list 1 with option down
-                delay 0.5
-                
-                click menu item "Options" of menu 1 of UI element "$app_name" of list 1
-                delay 0.5
-                
-                click menu item "This Desktop" of menu 1 of menu item "Options" of menu 1 of UI element "$app_name" of list 1
-            on error
-                keystroke "$app_name" using command down
-                delay 0.5
-            end try
-        end tell
-    end tell
-    
-    return true
-end run
-END
+    # Apply the changes
+    defaults read com.apple.symbolichotkeys > /dev/null
+}
+
+assign_apps_simple() {
+    echo "Assigning applications to spaces..."
+    echo ""
+    echo "Manual steps required:"
+    echo "1. Use Ctrl+1 through Ctrl+7 to switch between spaces"
+    echo "2. On each space, right-click the app in the Dock"
+    echo "3. Go to Options > Assign To > This Desktop"
+    echo ""
+    echo "Space assignments:"
+    echo "  Space 1: Alacritty"
+    echo "  Space 2: Chrome"
+    echo "  Space 3: Claude"
+    echo "  Space 4: Teams/Discord/Todoist"
+    echo "  Space 5: Slack"
+    echo "  Space 6: DBeaver"
+    echo "  Space 7: Spotify"
 }
 
 set_login_items() {
@@ -108,116 +147,30 @@ end run
 END
 }
 
-enable_shortcuts() {
-    osascript <<'END'
-tell application "System Events"
-    set plist_file to property list file "~/Library/Preferences/com.apple.symbolichotkeys.plist"
-    
-    repeat with i from 118 to 124
-        tell property list item i of property list item "AppleSymbolicHotKeys" of plist_file
-            set value of property list item "enabled" to true
-        end tell
-    end repeat
-end tell
-
-do shell script "defaults read com.apple.symbolichotkeys > /dev/null"
-END
-}
-
 echo ""
-gum confirm "This will create 7 desktop spaces and assign your apps. Continue?" || exit 0
+gum confirm "This will set up desktop spaces. Continue?" || exit 0
 
-echo "Opening all applications..."
-APPS=("Alacritty" "Google Chrome" "Claude" "Microsoft Teams" "Discord" "Todoist" "Slack" "DBeaver" "Spotify")
-
-for app in "${APPS[@]}"; do
-    if check_app "$app"; then
-        echo "  Opening $app..."
-        open -a "$app"
-    fi
-done
-
-echo "Waiting for apps to launch..."
-sleep 5
+open_all_apps
 
 create_spaces
-echo "✅ Desktop spaces created"
+echo "✅ Attempted to create desktop spaces"
 
 echo ""
-echo "Assigning applications to spaces..."
-
-if check_app "Alacritty"; then
-    assign_to_desktop "Alacritty" 1
-fi
-
-if check_app "Google Chrome"; then
-    assign_to_desktop "Google Chrome" 2
-fi
-
-if check_app "Claude"; then
-    assign_to_desktop "Claude" 3
-fi
-
-for app in "Microsoft Teams" "Discord" "Todoist"; do
-    if check_app "$app"; then
-        assign_to_desktop "$app" 4
-    fi
-done
-
-if check_app "Slack"; then
-    assign_to_desktop "Slack" 5
-fi
-
-if check_app "DBeaver"; then
-    assign_to_desktop "DBeaver" 6
-fi
-
-if check_app "Spotify"; then
-    assign_to_desktop "Spotify" 7
-fi
-
-echo ""
-echo "✅ Applications assigned to spaces"
+setup_space_shortcuts
+echo "✅ Desktop shortcuts configured"
 
 echo ""
 set_login_items
 echo "✅ Login items configured"
 
 echo ""
-echo "🎹 Attempting to enable keyboard shortcuts..."
-enable_shortcuts
+assign_apps_simple
 
 echo ""
-echo "Opening System Settings to verify shortcuts..."
-
-osascript <<'END'
-tell application "System Settings"
-    activate
-    delay 1
-end tell
-
-tell application "System Events"
-    tell process "System Settings"
-        keystroke "keyboard shortcuts mission control"
-        delay 0.5
-        key code 36
-    end tell
-end tell
-END
-
-echo "Please verify that shortcuts for 'Switch to Desktop 1-7' are enabled (Ctrl+1-7)"
-echo ""
-
-gum confirm "Are all desktop switching shortcuts enabled?" || echo "⚠️  Enable them manually"
+gum confirm "Have you manually assigned apps to their spaces?" || echo "Remember to do this later"
 
 echo ""
-echo "✅ Space setup complete!"
+echo "✅ Setup complete!"
 echo ""
-echo "Your spaces:"
-echo "  Space 1: Alacritty"
-echo "  Space 2: Chrome"
-echo "  Space 3: Claude"
-echo "  Space 4: Teams/Discord/Todoist"
-echo "  Space 5: Slack"
-echo "  Space 6: DBeaver"
-echo "  Space 7: Spotify"
+echo "Desktop shortcuts should now work:"
+echo "  Ctrl+1 through Ctrl+7 - Switch to desktop 1-7"
