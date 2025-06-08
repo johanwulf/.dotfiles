@@ -15,7 +15,6 @@ check_app() {
 grant_accessibility_permissions() {
     echo "Granting accessibility permissions..."
     
-    # Add Terminal to accessibility
     osascript <<'END'
 tell application "System Events"
     set UI elements enabled to true
@@ -24,7 +23,6 @@ END
 
     echo "Please grant accessibility permissions when prompted"
     
-    # Open accessibility settings
     open "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
     
     echo "Make sure Terminal is enabled in Accessibility permissions"
@@ -34,10 +32,8 @@ END
 create_spaces() {
     echo "Creating desktop spaces..."
     
-    # First ensure we have accessibility permissions
     grant_accessibility_permissions
     
-    # Use a different approach - create spaces via Mission Control
     osascript <<'END'
 tell application "Mission Control"
     activate
@@ -46,18 +42,14 @@ end tell
 delay 2
 
 tell application "System Events"
-    -- Get to Mission Control
     tell application "Mission Control" to activate
     delay 2
     
-    -- Try to create spaces by simulating clicks
     repeat 6 times
         try
-            -- Press the + button to add space
-            key code 24 using {control down, option down} -- This is Ctrl+Option+Plus
+            key code 24 using {control down, option down}
             delay 0.5
         on error
-            -- If that doesn't work, try clicking
             tell process "Dock"
                 click (last UI element of group 1 whose role description is "add desktop button")
                 delay 0.5
@@ -65,8 +57,7 @@ tell application "System Events"
         end try
     end repeat
     
-    -- Exit Mission Control
-    key code 53 -- Escape
+    key code 53
 end tell
 END
 }
@@ -90,16 +81,11 @@ open_all_apps() {
 setup_space_shortcuts() {
     echo "Setting up desktop shortcuts..."
     
-    # Enable shortcuts programmatically
     for i in {1..7}; do
-        # The symbolic hotkey IDs for Switch to Desktop 1-7 are 118-124
         hotkey_id=$((117 + i))
-        
-        # Enable the shortcut
         /usr/libexec/PlistBuddy -c "Set :AppleSymbolicHotKeys:$hotkey_id:enabled true" ~/Library/Preferences/com.apple.symbolichotkeys.plist 2>/dev/null || true
     done
     
-    # Apply the changes
     defaults read com.apple.symbolichotkeys > /dev/null
 }
 

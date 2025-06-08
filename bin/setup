@@ -14,6 +14,13 @@ echo -e "\033[1;31mProceeding will install Homebrew and package gum\033[0m"
 echo " "
 read -p "Press enter if you wish to continue"
 echo " "
+
+echo "This script requires administrator privileges for some operations"
+sudo -v
+
+# Keep sudo alive
+while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+
 echo "Installing Homebrew and gum..."
 
 which -s brew
@@ -21,7 +28,6 @@ which -s brew
 if [[ $? != 0 ]]; then
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" > /dev/null
   
-  # Add Homebrew to PATH for Apple Silicon Macs
   if [[ -f "/opt/homebrew/bin/brew" ]]; then
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
     eval "$(/opt/homebrew/bin/brew shellenv)"
@@ -63,7 +69,6 @@ echo "✅ brew upgraded"
 gum spin --spinner dot --title "Installing brew bundle packages..." -- brew bundle --file=$HOME/.config/Brewfile
 echo "✅ brew packages installed"
 
-# Fix for nvm
 export NVM_DIR="$HOME/.nvm"
 [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"
 nvm install --lts
@@ -85,51 +90,38 @@ defaults write NSGlobalDomain com.apple.swipescrolldirection -bool false
 defaults write com.apple.finder "AppleShowAllFiles" -bool "true"
 defaults write com.apple.screencapture "disable-shadow" -bool "true"
 
-# Remove all dock icons (only show running apps)
 defaults write com.apple.dock persistent-apps -array
 defaults write com.apple.dock persistent-others -array
 
-# Reduce motion
 defaults write com.apple.Accessibility ReduceMotionEnabled -bool true
 
-# Key repeat settings
 defaults write -g KeyRepeat -int 1
 defaults write -g InitialKeyRepeat -int 10
 
-# Trackpad right-click in bottom corner
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
 defaults -currentHost write NSGlobalDomain com.apple.trackpad.trackpadCornerClickBehavior -int 1
 defaults -currentHost write NSGlobalDomain com.apple.trackpad.enableSecondaryClick -bool true
 
-# Show Bluetooth in menu bar (for macOS Ventura and later)
 defaults -currentHost write com.apple.controlcenter Bluetooth -int 18
 
-# Show full path in Finder title
 defaults write com.apple.finder _FXShowPosixPathInTitle -bool true
 
-# Show battery percentage
 defaults write ~/Library/Preferences/ByHost/com.apple.controlcenter.plist BatteryShowPercentage -bool true
 
-# Screenshots to clipboard by default
 defaults write com.apple.screencapture target -string "clipboard"
 
-# Disable hot corners
 defaults write com.apple.dock wvous-tl-corner -int 0
 defaults write com.apple.dock wvous-tr-corner -int 0
 defaults write com.apple.dock wvous-bl-corner -int 0
 defaults write com.apple.dock wvous-br-corner -int 0
 
-# Disable startup sound
 sudo nvram SystemAudioVolume=" "
 
-# Caps Lock to Escape
 hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x700000029}]}'
 
-# Allow apps from unidentified developers
 sudo spctl --master-disable
 
-# Create .zshsecret if it doesn't exist
 touch ~/.zshsecret
 
 bash ~/bin/create-finder-terminal-service.sh 2>/dev/null || true
@@ -147,3 +139,4 @@ echo "🎉 Setup complete!"
 echo ""
 
 gum confirm "Restart now to apply all settings?" && sudo shutdown -r now || echo "Remember to restart later for all settings to take effect"
+
