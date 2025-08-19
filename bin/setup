@@ -95,8 +95,8 @@ defaults write com.apple.dock persistent-others -array
 
 defaults write com.apple.Accessibility ReduceMotionEnabled -bool true
 
-defaults write -g KeyRepeat -int 1
-defaults write -g InitialKeyRepeat -int 10
+defaults write -g KeyRepeat -int 2
+defaults write -g InitialKeyRepeat -int 12
 
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadCornerSecondaryClick -int 2
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad TrackpadRightClick -bool true
