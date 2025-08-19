@@ -8,7 +8,6 @@ alias ll="ls -al"
 alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias src="source ~/.zshenv && source ~/.zshrc"
 alias docker="podman"
-alias claude="SHELL=/bin/bash claude"
 alias "docker-compose"="podman-compose"
 alias gspp="git stash && git pull && git stash pop" # (g)it (s)tash (p)ull (p)op
 alias history="history 1"
@@ -142,7 +141,7 @@ zsh_plugin "qoomon/zsh-lazyload"
 # ================================================================== #
 # Sourcing                                                           #
 # ================================================================== #
-lazyload sdk -- "source $HOME/.sdkman/bin/sdkman-init.sh"
+source "$HOME/.sdkman/bin/sdkman-init.sh"
 lazyload nvm -- "source $HOMEBREW_PREFIX/opt/nvm/nvm.sh"
 lazyload gcloud -- "source $HOMEBREW_PREFIX/share/google-cloud-sdk/path.zsh.inc"
 lazyload -- source "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.zsh.inc"
@@ -167,8 +166,6 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 eval "$(starship init zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
-export JAVA_HOME="/opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home"
-export PATH=$JAVA_HOME/bin:$PATH
 
 # pnpm
 export PNPM_HOME="/Users/johan.wulf/Library/pnpm"
