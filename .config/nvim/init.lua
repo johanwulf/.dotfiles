@@ -1,12 +1,10 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
-vim.o.number = true
-vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
-vim.g.have_nerd_font = true
+
 vim.o.number = true
 vim.o.relativenumber = true
+vim.o.showmode = false
 
 vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
@@ -36,6 +34,7 @@ vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left wind
 vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 
 vim.keymap.set('n', '<leader>cp', function()
   local path = vim.fn.expand '%:p'
@@ -66,12 +65,10 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     error('Error cloning lazy.nvim:\n' .. out)
   end
 end
-
-local rtp = vim.opt.rtp
-rtp:prepend(lazypath)
+vim.opt.rtp:prepend(lazypath)
 
 require('lazy').setup({
-  'NMAC427/guess-indent.nvim',
+  'tpope/vim-sleuth',
 
   {
     'folke/which-key.nvim',
@@ -142,7 +139,6 @@ require('lazy').setup({
           },
         },
       }
-
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
 
@@ -191,7 +187,9 @@ require('lazy').setup({
   {
     'pmizio/typescript-tools.nvim',
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {},
+    opts = {
+      single_file_support = true,
+    },
   },
 
   {
@@ -238,24 +236,20 @@ require('lazy').setup({
               group = highlight_augroup,
               callback = vim.lsp.buf.document_highlight,
             })
-
             vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
               buffer = event.buf,
               group = highlight_augroup,
               callback = vim.lsp.buf.clear_references,
             })
-
             vim.api.nvim_create_autocmd('LspDetach', {
               group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
               callback = function(event2)
                 vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds {
-                  group = 'kickstart-lsp-highlight',
-                  buffer = event2.buf,
-                }
+                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
               end,
             })
           end
+
           if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
@@ -279,14 +273,8 @@ require('lazy').setup({
         virtual_text = {
           source = 'if_many',
           spacing = 2,
-          format = function(diagnostic)
-            local diagnostic_message = {
-              [vim.diagnostic.severity.ERROR] = diagnostic.message,
-              [vim.diagnostic.severity.WARN] = diagnostic.message,
-              [vim.diagnostic.severity.INFO] = diagnostic.message,
-              [vim.diagnostic.severity.HINT] = diagnostic.message,
-            }
-            return diagnostic_message[diagnostic.severity]
+          format = function(d)
+            return d.message
           end,
         },
       }
@@ -297,9 +285,7 @@ require('lazy').setup({
         lua_ls = {
           settings = {
             Lua = {
-              completion = {
-                callSnippet = 'Replace',
-              },
+              completion = { callSnippet = 'Replace' },
             },
           },
         },
@@ -325,65 +311,6 @@ require('lazy').setup({
           end,
         },
       }
-
-      local function prestart_lsp(ft, open_text)
-        local buf = vim.api.nvim_create_buf(false, true)
-        vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
-        vim.api.nvim_buf_set_lines(buf, 0, -1, false, open_text or { '' })
-        vim.api.nvim_buf_set_option(buf, 'filetype', ft)
-        vim.schedule(function()
-          if vim.api.nvim_buf_is_valid(buf) then
-            pcall(vim.api.nvim_buf_delete, buf, { force = true })
-          end
-        end)
-      end
-
-      vim.api.nvim_create_autocmd('VimEnter', {
-        once = true,
-        callback = function()
-          prestart_lsp('typescript', { '/* warmup */' })
-          prestart_lsp('typescriptreact', { '/* warmup */' })
-          prestart_lsp('javascript', { '/* warmup */' })
-          prestart_lsp('javascriptreact', { '/* warmup */' })
-          prestart_lsp('html', { '<!-- warmup -->' })
-          local buf = vim.api.nvim_create_buf(false, true)
-          vim.api.nvim_buf_set_name(buf, vim.fn.getcwd() .. '/.nvim_ts_eager.ts')
-          vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
-          vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
-          vim.api.nvim_buf_set_option(buf, 'filetype', 'typescript')
-          vim.api.nvim_buf_set_lines(buf, 0, -1, false, { '// eager start' })
-          vim.api.nvim_exec_autocmds('BufReadPost', { buffer = buf })
-          vim.defer_fn(function()
-            if vim.api.nvim_buf_is_valid(buf) then
-              pcall(vim.api.nvim_buf_delete, buf, { force = true })
-            end
-          end, 1000)
-        end,
-      })
-
-      vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('ttools-extra', { clear = true }),
-        callback = function(event)
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client.name == 'typescript-tools' then
-            local map = function(keys, func, desc)
-              vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'TS: ' .. desc })
-            end
-            map('<leader>co', function()
-              vim.lsp.buf.execute_command {
-                command = '_tsserver.organizeImports',
-                arguments = { vim.api.nvim_buf_get_name(event.buf) },
-              }
-            end, '[C]ode [O]rganize imports')
-            map('<leader>cF', function()
-              vim.lsp.buf.code_action {
-                apply = true,
-                context = { only = { 'source.fixAll' } },
-              }
-            end, '[C]ode Fix all')
-          end
-        end,
-      })
     end,
   },
 
@@ -408,10 +335,7 @@ require('lazy').setup({
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else
-          return {
-            timeout_ms = 500,
-            lsp_format = 'never',
-          }
+          return { timeout_ms = 500, lsp_format = 'never' }
         end
       end,
       formatters_by_ft = {
@@ -444,15 +368,9 @@ require('lazy').setup({
       'folke/lazydev.nvim',
     },
     opts = {
-      keymap = {
-        preset = 'default',
-      },
-      appearance = {
-        nerd_font_variant = 'mono',
-      },
-      completion = {
-        documentation = { auto_show = false, auto_show_delay_ms = 500 },
-      },
+      keymap = { preset = 'default' },
+      appearance = { nerd_font_variant = 'mono' },
+      completion = { documentation = { auto_show = false, auto_show_delay_ms = 500 } },
       sources = {
         default = { 'lsp', 'path', 'snippets', 'lazydev' },
         providers = {
@@ -516,7 +434,5 @@ require('lazy').setup({
 
   { import = 'custom.plugins' },
 }, {
-  ui = {
-    icons = vim.g.have_nerd_font and {} or {},
-  },
+  ui = { icons = vim.g.have_nerd_font and {} or {} },
 })
