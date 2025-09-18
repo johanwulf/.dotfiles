@@ -54,7 +54,14 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
-  local out = vim.fn.system { 'git', 'clone', '--filter=blob:none', '--branch=stable', lazyrepo, lazypath }
+  local out = vim.fn.system {
+    'git',
+    'clone',
+    '--filter=blob:none',
+    '--branch=stable',
+    lazyrepo,
+    lazypath,
+  }
   if vim.v.shell_error ~= 0 then
     error('Error cloning lazy.nvim:\n' .. out)
   end
@@ -182,6 +189,12 @@ require('lazy').setup({
   },
 
   {
+    'pmizio/typescript-tools.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+    opts = {},
+  },
+
+  {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'mason-org/mason.nvim', opts = {} },
@@ -236,7 +249,10 @@ require('lazy').setup({
               group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
               callback = function(event2)
                 vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+                vim.api.nvim_clear_autocmds {
+                  group = 'kickstart-lsp-highlight',
+                  buffer = event2.buf,
+                }
               end,
             })
           end
@@ -287,25 +303,14 @@ require('lazy').setup({
             },
           },
         },
-        ts_ls = {
-          settings = {
-            typescript = {
-              format = { enable = false },
-              suggest = { completeFunctionCalls = true },
-            },
-            javascript = {
-              format = { enable = false },
-            },
-          },
-        },
         tailwindcss = {},
       }
 
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua',
-        'ts_ls',
         'tailwindcss-language-server',
+        'prettierd',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -332,6 +337,7 @@ require('lazy').setup({
           end
         end)
       end
+
       vim.api.nvim_create_autocmd('VimEnter', {
         once = true,
         callback = function()
@@ -340,6 +346,42 @@ require('lazy').setup({
           prestart_lsp('javascript', { '/* warmup */' })
           prestart_lsp('javascriptreact', { '/* warmup */' })
           prestart_lsp('html', { '<!-- warmup -->' })
+          local buf = vim.api.nvim_create_buf(false, true)
+          vim.api.nvim_buf_set_name(buf, vim.fn.getcwd() .. '/.nvim_ts_eager.ts')
+          vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+          vim.api.nvim_buf_set_option(buf, 'bufhidden', 'wipe')
+          vim.api.nvim_buf_set_option(buf, 'filetype', 'typescript')
+          vim.api.nvim_buf_set_lines(buf, 0, -1, false, { '// eager start' })
+          vim.api.nvim_exec_autocmds('BufReadPost', { buffer = buf })
+          vim.defer_fn(function()
+            if vim.api.nvim_buf_is_valid(buf) then
+              pcall(vim.api.nvim_buf_delete, buf, { force = true })
+            end
+          end, 1000)
+        end,
+      })
+
+      vim.api.nvim_create_autocmd('LspAttach', {
+        group = vim.api.nvim_create_augroup('ttools-extra', { clear = true }),
+        callback = function(event)
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          if client and client.name == 'typescript-tools' then
+            local map = function(keys, func, desc)
+              vim.keymap.set('n', keys, func, { buffer = event.buf, desc = 'TS: ' .. desc })
+            end
+            map('<leader>co', function()
+              vim.lsp.buf.execute_command {
+                command = '_tsserver.organizeImports',
+                arguments = { vim.api.nvim_buf_get_name(event.buf) },
+              }
+            end, '[C]ode [O]rganize imports')
+            map('<leader>cF', function()
+              vim.lsp.buf.code_action {
+                apply = true,
+                context = { only = { 'source.fixAll' } },
+              }
+            end, '[C]ode Fix all')
+          end
         end,
       })
     end,
