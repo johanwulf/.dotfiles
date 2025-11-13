@@ -138,16 +138,6 @@ zsh_plugin "jeffreytse/zsh-vi-mode"
 zsh_plugin "zsh-users/zsh-syntax-highlighting"
 
 # ================================================================== #
-# Optimize compinit - only check once a day                          #
-# ================================================================== #
-autoload -Uz compinit
-if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
-    compinit
-else
-    compinit -C
-fi
-
-# ================================================================== #
 # gcloud - lazy load to save 31ms on startup                         #
 # ================================================================== #
 gcloud() {
