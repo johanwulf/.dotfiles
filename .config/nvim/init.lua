@@ -261,7 +261,7 @@ require('lazy').setup({
       vim.diagnostic.config {
         severity_sort = true,
         float = { border = 'rounded', source = 'if_many' },
-        underline = { severity = vim.diagnostic.severity.ERROR },
+        underline = true,
         virtual_text = {
           source = 'if_many',
           spacing = 2,
@@ -383,6 +383,8 @@ require('lazy').setup({
     config = function()
       vim.cmd.colorscheme 'catppuccin-macchiato'
       vim.cmd.hi 'Comment gui=none'
+      vim.api.nvim_set_hl(0, 'DiagnosticUnnecessary', { fg = '#939ab7', italic = true })
+      vim.api.nvim_set_hl(0, 'DiagnosticUnderlineHint', { sp = '#939ab7', underline = true })
     end,
   },
 
