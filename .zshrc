@@ -7,10 +7,31 @@ alias la="ls -a"
 alias ll="ls -al"
 alias dfs='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 alias src="source ~/.zshenv && source ~/.zshrc"
-alias docker="podman"
-alias "docker-compose"="podman-compose"
-alias gspp="git stash && git pull && git stash pop" # (g)it (s)tash (p)ull (p)op
 alias history="history 1"
+
+# ================================================================== #
+# History                                                            #
+# ================================================================== #
+export HISTSIZE=100000
+export SAVEHIST=100000
+setopt EXTENDED_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_SAVE_NO_DUPS
+setopt SHARE_HISTORY
+
+# ================================================================== #
+# Exports & Paths                                                    #
+# ================================================================== #
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+export PNPM_HOME="/Users/johan.wulf/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
 
 # ================================================================== #
 # CTRL + Z to tab in and out of current buffer                       #
@@ -23,7 +44,6 @@ ctrlz () {
         zle push-input -w
     fi
 }
-
 zle -N ctrlz
 bindkey ^Z ctrlz
 
@@ -38,7 +58,6 @@ ff () {
         zle accept-line
     fi
 }
-
 zle -N ff
 bindkey ^F ff
 
@@ -52,7 +71,6 @@ fn () {
         zle accept-line
     fi
 }
-
 zle -N fn
 bindkey ^N fn
 
@@ -63,7 +81,8 @@ ft () {
     if [[ $# -eq 1 ]]; then
         selected=$1
     else
-        selected=$(find $REPOS_PATH $CONFIG_PATH ~ -mindepth 0 -maxdepth 1 | fzf)
+        selected=$(find $REPOS_PATH -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | fzf)
+        [[ -n $selected ]] && selected="$REPOS_PATH/$selected"
     fi
 
     if [[ -z $selected ]]; then
@@ -84,7 +103,6 @@ ft () {
 
     tmux switch-client -t $selected_name
 }
-
 zle -N ft
 bindkey ^T ft
 
@@ -95,86 +113,62 @@ fh() {
     print -z $(history | sed -re 's/ *[0-9]* *//' | fzf)
     zle accept-line
 }
-
 zle -N fh
 bindkey ^H fh
 
-bindkey "^[[A" history-search-backward
-bindkey "^[[B" history-search-forward
-
 # ================================================================== #
-# History                                                            #
+# Prompt                                                             #
 # ================================================================== #
-export HISTSIZE=100000
-export SAVEHIST=100000
-setopt EXTENDED_HISTORY
-setopt HIST_EXPIRE_DUPS_FIRST
-setopt HIST_FIND_NO_DUPS
-setopt HIST_IGNORE_ALL_DUPS
-setopt HIST_IGNORE_DUPS
-setopt HIST_IGNORE_SPACE
-setopt HIST_SAVE_NO_DUPS
-setopt SHARE_HISTORY
-
-# ================================================================== #
-# Exports, paths and stuff                                           #
-# ================================================================== #
-export NVM_DIR="$HOME/.nvm"
-export SDKMAN_DIR="$HOME/.sdkman"
-export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+eval "$(starship init zsh)"
+eval "$(zoxide init --cmd cd zsh)"
 
 # ================================================================== #
 # zsh plugin manager                                                 #
 # ================================================================== #
 zsh_plugin() {
     PLUGIN_NAME="${1#*/}"
+    PLUGIN_PATH="$ZSH_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh"
     [ ! -d "$ZSH_PLUGIN_DIR" ] && mkdir -p $ZSH_PLUGIN_DIR
-    [ ! -f "$ZSH_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh" ] && git clone "https://github.com/$1" $ZSH_PLUGIN_DIR/$PLUGIN_NAME
-    source "$ZSH_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME.plugin.zsh"
+    [ ! -f "$PLUGIN_PATH" ] && git clone "https://github.com/$1" $ZSH_PLUGIN_DIR/$PLUGIN_NAME
+    source "$PLUGIN_PATH"
 }
 
-zsh_plugin "zsh-users/zsh-syntax-highlighting"
 zsh_plugin "zsh-users/zsh-autosuggestions"
 zsh_plugin "jeffreytse/zsh-vi-mode"
-zsh_plugin "qoomon/zsh-lazyload"
+zsh_plugin "zsh-users/zsh-syntax-highlighting"
 
 # ================================================================== #
-# Sourcing                                                           #
+# Optimize compinit - only check once a day                          #
 # ================================================================== #
-source "$HOME/.sdkman/bin/sdkman-init.sh"
-lazyload nvm -- "source $HOMEBREW_PREFIX/opt/nvm/nvm.sh"
-lazyload gcloud -- "source $HOMEBREW_PREFIX/share/google-cloud-sdk/path.zsh.inc"
-lazyload -- source "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.zsh.inc"
-lazyload -- source "$HOMEBREW_PREFIX/opt/nvm/etc/bash_completion.d/nvm"
+autoload -Uz compinit
+if [[ -n ${ZDOTDIR}/.zcompdump(#qN.mh+24) ]]; then
+    compinit
+else
+    compinit -C
+fi
+
+# ================================================================== #
+# gcloud - lazy load to save 31ms on startup                         #
+# ================================================================== #
+gcloud() {
+    # Load gcloud on first use
+    if [[ -s "$HOMEBREW_PREFIX/share/google-cloud-sdk/path.zsh.inc" ]]; then
+        source "$HOMEBREW_PREFIX/share/google-cloud-sdk/path.zsh.inc"
+    fi
+    if [[ -s "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.zsh.inc" ]]; then
+        source "$HOMEBREW_PREFIX/share/google-cloud-sdk/completion.zsh.inc"
+    fi
+    # Remove this function and call the real gcloud
+    unfunction gcloud
+    gcloud "$@"
+}
+
+# ================================================================== #
+# Secrets                                                             #
+# ================================================================== #
 source "$HOME/.zshsecret"
 
 # ================================================================== #
-# zsh plugin manager                                                 #
+# Work related commands                                              #
 # ================================================================== #
-tmux_plugin() {
-    PLUGIN_NAME="${1#*/}"
-    [ ! -d "$TMUX_PLUGIN_DIR" ] && mkdir -p $TMUX_PLUGIN_DIR
-    [ ! -f "$TMUX_PLUGIN_DIR/$PLUGIN_NAME/$PLUGIN_NAME" ] && git clone "https://github.com/$1" $TMUX_PLUGIN_DIR/$PLUGIN_NAME
-}
-
-tmux_plugin "tmux-plugins/tpm"
-
-# ================================================================== #
-# Evals                                                              #
-# ================================================================== #
-eval "$(/opt/homebrew/bin/brew shellenv)"
-eval "$(starship init zsh)"
-eval "$(zoxide init --cmd cd zsh)"
-
-
-# pnpm
-export PNPM_HOME="/Users/johan.wulf/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end
-
-export NVM_DIR="$HOME/.nvm"
-  [ -s "/opt/homebrew/opt/nvm/nvm.sh" ] && \. "/opt/homebrew/opt/nvm/nvm.sh"  # This loads nvm
-  [ -s "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm" ] && \. "/opt/homebrew/opt/nvm/etc/bash_completion.d/nvm"  # This loads nvm bash_completion
+source "$HOME/.zshwork"
