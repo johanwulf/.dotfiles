@@ -23,10 +23,14 @@ return {
     'nvim-telescope/telescope.nvim',
     optional = true,
     lazy = false,
-    config = function()
-      vim.keymap.set('n', '<C-t>', function()
-        require('custom.tmux-switcher').open()
-      end, { noremap = true, silent = true, desc = '[T]mux session switcher' })
-    end,
+    keys = {
+      {
+        '<C-t>',
+        function()
+          require('custom.tmux-switcher').open()
+        end,
+        desc = '[T]mux session switcher',
+      },
+    },
   },
 }
