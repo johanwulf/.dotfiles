@@ -162,3 +162,4 @@ source "$HOME/.zshsecret"
 # Work related commands                                              #
 # ================================================================== #
 source "$HOME/.zshwork"
+export PATH="/opt/homebrew/opt/node@24/bin:$PATH"

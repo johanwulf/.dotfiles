@@ -1,3 +1,5 @@
+vim.env.PATH = '/opt/homebrew/opt/node@24/bin:' .. vim.env.PATH
+
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
