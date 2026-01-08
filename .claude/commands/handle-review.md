@@ -1,8 +1,9 @@
-Fetch and analyze PR review comments for the current branch.
+First, run this command to fetch PR review comments:
+```
+pr-comments $ARGUMENTS
+```
 
-Run: `pr-comments $ARGUMENTS`
-
-For each unresolved comment:
+Then, for each unresolved comment:
 1. Read the relevant code and investigate whether the feedback is valid
 
 Present all findings in a table with columns: File, Comment Summary, Valid?, Response/Action
