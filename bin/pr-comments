@@ -1,0 +1,185 @@
+#!/usr/bin/env python3
+import argparse
+import json
+import subprocess
+import sys
+from typing import Optional
+
+
+def run_gh(args: list[str]) -> str:
+    result = subprocess.run(["gh"] + args, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"Error running gh {' '.join(args)}: {result.stderr}", file=sys.stderr)
+        sys.exit(1)
+    return result.stdout
+
+
+def get_current_branch() -> str:
+    result = subprocess.run(
+        ["git", "rev-parse", "--abbrev-ref", "HEAD"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print(f"Error getting current branch: {result.stderr}", file=sys.stderr)
+        sys.exit(1)
+    return result.stdout.strip()
+
+
+def get_pr_number_for_branch(branch: str) -> Optional[int]:
+    output = run_gh(["pr", "list", "--head", branch, "--json", "number", "--limit", "1"])
+    prs = json.loads(output)
+    if not prs:
+        return None
+    return prs[0]["number"]
+
+
+def get_review_threads(pr_number: int) -> list[dict]:
+    query = """
+    query($owner: String!, $repo: String!, $pr: Int!, $cursor: String) {
+      repository(owner: $owner, name: $repo) {
+        pullRequest(number: $pr) {
+          reviewThreads(first: 100, after: $cursor) {
+            pageInfo { hasNextPage endCursor }
+            nodes {
+              isResolved
+              comments(first: 100) {
+                nodes {
+                  id databaseId body path line startLine diffHunk
+                  author { login }
+                  createdAt
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    """
+
+    repo_info = run_gh(["repo", "view", "--json", "owner,name"])
+    repo_data = json.loads(repo_info)
+    owner = repo_data["owner"]["login"]
+    repo = repo_data["name"]
+
+    all_threads = []
+    cursor = None
+
+    while True:
+        cmd = [
+            "api", "graphql",
+            "-f", f"query={query}",
+            "-F", f"owner={owner}",
+            "-F", f"repo={repo}",
+            "-F", f"pr={pr_number}",
+        ]
+        if cursor:
+            cmd.extend(["-f", f"cursor={cursor}"])
+        else:
+            cmd.extend(["-f", "cursor=null"])
+
+        output = run_gh(cmd)
+        data = json.loads(output)
+        threads_data = data["data"]["repository"]["pullRequest"]["reviewThreads"]
+        all_threads.extend(threads_data["nodes"])
+
+        if not threads_data["pageInfo"]["hasNextPage"]:
+            break
+        cursor = threads_data["pageInfo"]["endCursor"]
+
+    return all_threads
+
+
+def format_comment_markdown(thread: dict) -> str:
+    comments = thread["comments"]["nodes"]
+    if not comments:
+        return ""
+
+    first_comment = comments[0]
+    path = first_comment.get("path", "unknown")
+    line = first_comment.get("line")
+    start_line = first_comment.get("startLine")
+    is_resolved = thread.get("isResolved", False)
+
+    if start_line and line and start_line != line:
+        location = f"L{start_line}-L{line}"
+    elif line:
+        location = f"L{line}"
+    else:
+        location = "file-level"
+
+    status = "✅ Resolved" if is_resolved else "⏳ Unresolved"
+
+    lines = [
+        f"## `{path}:{location}`",
+        f"**Status:** {status}",
+        "",
+    ]
+
+    diff_hunk = first_comment.get("diffHunk")
+    if diff_hunk:
+        lines.extend(["**Code context:**", "```diff", diff_hunk, "```", ""])
+
+    for i, comment in enumerate(comments):
+        author = comment.get("author", {}).get("login", "unknown")
+        body = comment.get("body", "").strip()
+
+        if i == 0:
+            lines.append(f"**@{author}:**")
+        else:
+            lines.append(f"**@{author}** (reply):")
+
+        lines.extend([body, ""])
+
+    lines.append("---")
+    lines.append("")
+
+    return "\n".join(lines)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Fetch PR review comments")
+    parser.add_argument("--pr", type=int, help="PR number (defaults to current branch)")
+    filter_group = parser.add_mutually_exclusive_group()
+    filter_group.add_argument("--unresolved", action="store_true", help="Only unresolved")
+    filter_group.add_argument("--resolved", action="store_true", help="Only resolved")
+
+    args = parser.parse_args()
+
+    pr_number = args.pr
+    if not pr_number:
+        branch = get_current_branch()
+        pr_number = get_pr_number_for_branch(branch)
+        if not pr_number:
+            print(f"No PR found for branch '{branch}'", file=sys.stderr)
+            sys.exit(1)
+        print(f"Found PR #{pr_number} for branch '{branch}'\n", file=sys.stderr)
+
+    threads = get_review_threads(pr_number)
+
+    if args.unresolved:
+        threads = [t for t in threads if not t.get("isResolved", False)]
+    elif args.resolved:
+        threads = [t for t in threads if t.get("isResolved", False)]
+
+    if not threads:
+        filter_desc = " unresolved" if args.unresolved else " resolved" if args.resolved else ""
+        print(f"No{filter_desc} review comments found for PR #{pr_number}", file=sys.stderr)
+        sys.exit(0)
+
+    print(f"# Review Comments for PR #{pr_number}")
+    print()
+
+    unresolved_count = sum(1 for t in threads if not t.get("isResolved", False))
+    resolved_count = sum(1 for t in threads if t.get("isResolved", False))
+    print(f"**Total:** {len(threads)} threads ({unresolved_count} unresolved, {resolved_count} resolved)")
+    print()
+
+    for thread in threads:
+        output = format_comment_markdown(thread)
+        if output:
+            print(output)
+
+
+if __name__ == "__main__":
+    main()
