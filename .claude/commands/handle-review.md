@@ -1,6 +1,6 @@
 First, run this command to fetch PR review comments:
 ```
-pr-comments $ARGUMENTS
+pr-comments --unresolved
 ```
 
 Then, for each unresolved comment:
