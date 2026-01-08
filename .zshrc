@@ -120,7 +120,9 @@ bindkey ^H fh
 # Prompt                                                             #
 # ================================================================== #
 eval "$(starship init zsh)"
-eval "$(zoxide init --cmd cd zsh)"
+if [[ "$CLAUDECODE" != "1" ]]; then
+    eval "$(zoxide init --cmd cd zsh)"
+fi
 
 # ================================================================== #
 # zsh plugin manager                                                 #
