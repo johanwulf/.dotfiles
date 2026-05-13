@@ -63,7 +63,8 @@ record_tool_usage_stats: false
 token_count_estimator: TIKTOKEN_GPT4O
 
 # the list of registered project paths (updated automatically).
-projects: []
+projects:
+- /Users/johan.wulf/repos/pricera-frontend
 # the language backend to use for code understanding and manipulation.
 # Possible values are:
 #  * LSP: Use the language server protocol (LSP), spawning freely available language servers
