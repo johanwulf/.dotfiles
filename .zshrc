@@ -90,11 +90,10 @@ ft () {
     fi
 
     selected_name=$(basename "$selected" | tr . _)
-    tmux_running=$(pgrep tmux)
 
-    if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-        tmux new-session -s $selected_name -c $selected
-        exit 0
+    if [[ -z $TMUX ]]; then
+        tmux new-session -A -s $selected_name -c $selected
+        return 0
     fi
 
     if ! tmux has-session -t=$selected_name 2> /dev/null; then
@@ -103,8 +102,13 @@ ft () {
 
     tmux switch-client -t $selected_name
 }
-zle -N ft
-bindkey ^T ft
+ft-widget() {
+    zle push-input
+    BUFFER="ft"
+    zle accept-line
+}
+zle -N ft-widget
+bindkey ^T ft-widget
 
 # ================================================================== #
 # CTRL + H to fuzzy find zsh history                                 #
