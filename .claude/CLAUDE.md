@@ -32,6 +32,12 @@
 - Discuss framework changes, major refactoring, or system design before implementing
 - Never implement backward compatibility without explicit approval
 
+## Code Style
+- Avoid nested ternaries — use if/else, early returns, or extracted functions
+- Avoid ternaries with multiple conditions (e.g., `a || b ? ... : ...`) — use a named variable or function
+- Prefer `if/else` over ternaries when either branch is non-trivial
+- Ternaries are fine only for simple value selection: `const x = cond ? a : b`
+
 ## When Stuck
 - Stop and ask rather than guessing
 
