@@ -1,18 +1,19 @@
 local M = {}
+local uv = vim.uv
 
 vim.api.nvim_set_hl(0, 'TmuxSessionCurrent', { fg = '#88C0D0', bold = true })
 vim.api.nvim_set_hl(0, 'TmuxSessionActive', { fg = '#5E81AC' })
 vim.api.nvim_set_hl(0, 'TmuxSessionInactive', { fg = '#4C566A' })
 
 local function get_dirs(path)
-  local handle = vim.loop.fs_scandir(path)
+  local handle = uv.fs_scandir(path)
   if not handle then
     return {}
   end
 
   local dirs = {}
   while true do
-    local name, type = vim.loop.fs_scandir_next(handle)
+    local name, type = uv.fs_scandir_next(handle)
     if not name then
       break
     end

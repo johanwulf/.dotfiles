@@ -1,3 +1,5 @@
+vim.loader.enable()
+
 vim.env.PATH = '/opt/homebrew/opt/node@24/bin:' .. vim.env.PATH
 
 vim.g.mapleader = ' '
@@ -6,6 +8,7 @@ vim.g.have_nerd_font = true
 
 vim.o.number = true
 vim.o.relativenumber = true
+vim.o.mouse = 'a'
 vim.o.showmode = false
 
 vim.schedule(function()
@@ -53,7 +56,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 })
 
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-if not (vim.uv or vim.loop).fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   local lazyrepo = 'https://github.com/folke/lazy.nvim.git'
   local out = vim.fn.system {
     'git',
@@ -131,10 +134,40 @@ require('lazy').setup({
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      {
+        'nvim-tree/nvim-web-devicons',
+        enabled = vim.g.have_nerd_font,
+        opts = {
+          override = {
+            ['pnpm-lock.yaml'] = { icon = '', color = '#cbcb41', name = 'Yaml' },
+            ['pnpm-workspace.yaml'] = { icon = '', color = '#cbcb41', name = 'Yaml' },
+            yaml = { icon = '', color = '#cbcb41', name = 'Yaml' },
+            yml = { icon = '', color = '#cbcb41', name = 'Yaml' },
+          },
+        },
+      },
     },
     config = function()
       require('telescope').setup {
+        defaults = {
+          vimgrep_arguments = {
+            'rg',
+            '--color=never',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--smart-case',
+            '--hidden',
+            '--glob',
+            '!.git/*',
+          },
+        },
+        pickers = {
+          find_files = {
+            hidden = true,
+          },
+        },
         extensions = {
           ['ui-select'] = {
             require('telescope.themes').get_dropdown(),
@@ -187,14 +220,6 @@ require('lazy').setup({
   },
 
   {
-    'pmizio/typescript-tools.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {
-      single_file_support = true,
-    },
-  },
-
-  {
     'neovim/nvim-lspconfig',
     dependencies = {
       { 'mason-org/mason.nvim', opts = {} },
@@ -223,15 +248,8 @@ require('lazy').setup({
           map('K', vim.lsp.buf.hover, 'Hover Documentation')
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
-          local function client_supports_method(client, method, bufnr)
-            if vim.fn.has 'nvim-0.11' == 1 then
-              return client:supports_method(method, bufnr)
-            else
-              return client.supports_method(method, { bufnr = bufnr })
-            end
-          end
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
+          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
             local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
             vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
               buffer = event.buf,
@@ -252,7 +270,7 @@ require('lazy').setup({
             })
           end
 
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
+          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
@@ -274,8 +292,43 @@ require('lazy').setup({
       }
 
       local capabilities = require('blink.cmp').get_lsp_capabilities()
+      local kotlin_maven_profiles = {}
+
+      local function maven_project(root)
+        local root_pom = vim.fs.joinpath(root, 'pom.xml')
+        if vim.fn.filereadable(root_pom) ~= 1 then
+          return root, nil
+        end
+
+        local root_pom_text = table.concat(vim.fn.readfile(root_pom), '\n')
+        local artifact = root_pom_text:match '</parent>%s*<artifactId>%s*([^%s<]+)%s*</artifactId>'
+        local current = root
+        while current do
+          local pom = vim.fs.joinpath(current, 'pom.xml')
+          if vim.fn.filereadable(pom) == 1 then
+            local pom_text = table.concat(vim.fn.readfile(pom), '\n')
+            local profile = artifact and 'build-' .. artifact
+            if profile and pom_text:find '<modules>' and pom_text:find('<id>' .. profile .. '</id>', 1, true) then
+              return current, profile
+            end
+          end
+
+          local parent = vim.fs.dirname(current)
+          if parent == current then
+            break
+          end
+          current = parent
+        end
+
+        return root, nil
+      end
 
       local servers = {
+        bashls = {},
+        cssls = {},
+        eslint = {},
+        html = {},
+        jsonls = {},
         lua_ls = {
           settings = {
             Lua = {
@@ -283,28 +336,200 @@ require('lazy').setup({
             },
           },
         },
-        tailwindcss = {},
-      }
+        kotlin_lsp = {
+          cmd = function(dispatchers, config)
+            local root_dir = config.root_dir or vim.fn.getcwd()
+            local system_path = vim.fs.joinpath(vim.fn.stdpath 'cache', 'kotlin-lsp', vim.fn.sha256(root_dir):sub(1, 12))
+            local env = vim.fn.environ()
+            if config.cmd_env then
+              env = vim.tbl_extend('force', env, config.cmd_env)
+            end
+            if kotlin_maven_profiles[root_dir] then
+              env.MAVEN_ARGS = '-P' .. kotlin_maven_profiles[root_dir]
+            end
 
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'stylua',
-        'tailwindcss-language-server',
-        'prettierd',
-      })
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
-      require('mason-lspconfig').setup {
-        ensure_installed = {},
-        automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-            require('lspconfig')[server_name].setup(server)
+            return vim.lsp.rpc.start(
+              { 'intellij-server', '--stdio', '--system-path', system_path },
+              dispatchers,
+              { env = env }
+            )
           end,
+          root_dir = function(bufnr, on_dir)
+            local module_root = vim.fs.root(bufnr, {
+              'settings.gradle',
+              'settings.gradle.kts',
+              'pom.xml',
+              'build.gradle',
+              'build.gradle.kts',
+              'gradle.properties',
+              '.git',
+            })
+
+            local root, profile = maven_project(module_root or vim.fn.getcwd())
+            if profile then
+              kotlin_maven_profiles[root] = profile
+            end
+            on_dir(root)
+          end,
+          root_markers = {
+            'settings.gradle',
+            'settings.gradle.kts',
+            'pom.xml',
+            'build.gradle',
+            'build.gradle.kts',
+            'gradle.properties',
+            '.git',
+          },
+        },
+        tailwindcss = {},
+        ts_ls = {
+          before_init = function(params, config)
+            local root_dir = params.rootUri and vim.uri_to_fname(params.rootUri) or config.root_dir
+            local workspace_tsserver = root_dir and vim.fs.joinpath(root_dir, 'node_modules/typescript/lib/tsserver.js')
+            local tsserver_path = workspace_tsserver
+
+            if not tsserver_path or vim.fn.filereadable(tsserver_path) ~= 1 then
+              tsserver_path = vim.fs.joinpath(vim.fn.stdpath 'data', 'mason/packages/typescript-language-server/node_modules/typescript/lib/tsserver.js')
+            end
+
+            config.init_options.tsserver.path = tsserver_path
+          end,
+          init_options = {
+            disableAutomaticTypingAcquisition = true,
+            hostInfo = 'neovim',
+            maxTsServerMemory = 4096,
+            tsserver = {
+              path = vim.fs.joinpath(vim.fn.stdpath 'data', 'mason/packages/typescript-language-server/node_modules/typescript/lib/tsserver.js'),
+              useSyntaxServer = 'auto',
+            },
+          },
         },
       }
+
+      vim.lsp.config('*', { capabilities = capabilities })
+      for server_name, server_config in pairs(servers) do
+        vim.lsp.config(server_name, server_config)
+      end
+
+      local ensure_installed = vim.tbl_keys(servers)
+      table.insert(ensure_installed, 'jdtls')
+      require('mason-lspconfig').setup {
+        ensure_installed = ensure_installed,
+        automatic_enable = vim.tbl_keys(servers),
+      }
+
+      require('mason-tool-installer').setup {
+        ensure_installed = {
+          'stylua',
+          'tailwindcss-language-server',
+          'prettierd',
+        },
+      }
+    end,
+  },
+
+  {
+    'mfussenegger/nvim-jdtls',
+    ft = 'java',
+    dependencies = { 'mason-org/mason.nvim', 'saghen/blink.cmp' },
+    config = function()
+      local jdtls = require 'jdtls'
+      local root_markers = {
+        'mvnw',
+        'gradlew',
+        'pom.xml',
+        'build.gradle',
+        'build.gradle.kts',
+        '.git',
+      }
+      local notified_missing_jdtls = false
+
+      local function find_lombok()
+        local candidates = {
+          vim.fn.stdpath 'data' .. '/mason/packages/jdtls/lombok.jar',
+          vim.fn.expand '~/.local/share/java/lombok.jar',
+        }
+        vim.list_extend(candidates, vim.fn.glob(vim.fn.expand '~/.m2/repository/org/projectlombok/lombok/*/lombok-*.jar', false, true))
+
+        for _, path in ipairs(candidates) do
+          if path ~= '' and vim.fn.filereadable(path) == 1 then
+            return path
+          end
+        end
+      end
+
+      local function start_jdtls(bufnr)
+        if vim.bo[bufnr].filetype ~= 'java' then
+          return
+        end
+
+        if vim.fn.executable 'jdtls' ~= 1 then
+          if not notified_missing_jdtls then
+            vim.notify('jdtls is not available yet. Run :MasonInstall jdtls and reopen the Java buffer.', vim.log.levels.WARN)
+            notified_missing_jdtls = true
+          end
+          return
+        end
+
+        local source = vim.api.nvim_buf_get_name(bufnr)
+        local root_dir = jdtls.setup.find_root(root_markers, source) or vim.fn.getcwd()
+        local project_name = vim.fn.fnamemodify(root_dir, ':t')
+        local workspace_dir = vim.fs.joinpath(vim.fn.stdpath 'cache', 'jdtls', project_name .. '-' .. vim.fn.sha256(root_dir):sub(1, 8))
+        local lombok = find_lombok()
+        local jvm_args = { '--jvm-arg=-Xmx4G' }
+        if lombok then
+          table.insert(jvm_args, '--jvm-arg=-javaagent:' .. lombok)
+        end
+
+        jdtls.start_or_attach {
+          cmd = vim.list_extend({ 'jdtls' }, vim.list_extend(jvm_args, { '-data', workspace_dir })),
+          capabilities = require('blink.cmp').get_lsp_capabilities(),
+          root_dir = root_dir,
+          settings = {
+            java = {
+              configuration = {
+                updateBuildConfiguration = 'interactive',
+              },
+              contentProvider = {
+                preferred = 'fernflower',
+              },
+              eclipse = {
+                downloadSources = true,
+              },
+              implementationsCodeLens = {
+                enabled = true,
+              },
+              maven = {
+                downloadSources = true,
+              },
+              references = {
+                includeDecompiledSources = true,
+              },
+              referencesCodeLens = {
+                enabled = true,
+              },
+              signatureHelp = {
+                enabled = true,
+              },
+            },
+          },
+          init_options = {
+            bundles = {},
+          },
+        }
+      end
+
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = 'java',
+        group = vim.api.nvim_create_augroup('java-jdtls', { clear = true }),
+        callback = function(event)
+          start_jdtls(event.buf)
+        end,
+      })
+
+      if vim.bo.filetype == 'java' then
+        start_jdtls(0)
+      end
     end,
   },
 
@@ -405,27 +630,68 @@ require('lazy').setup({
 
   {
     'nvim-treesitter/nvim-treesitter',
+    branch = 'main',
+    lazy = false,
     build = ':TSUpdate',
-    main = 'nvim-treesitter.configs',
-    opts = {
-      ensure_installed = {
+    config = function()
+      local treesitter = require 'nvim-treesitter'
+      local parsers = {
         'bash',
+        'css',
         'html',
+        'java',
+        'kotlin',
+        'javascript',
+        'json',
         'lua',
         'luadoc',
         'markdown',
         'markdown_inline',
         'query',
+        'ruby',
+        'tsx',
+        'typescript',
         'vim',
         'vimdoc',
-      },
-      auto_install = true,
-      highlight = {
-        enable = true,
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = true, disable = { 'ruby' } },
-    },
+      }
+      local filetypes = {
+        'bash',
+        'css',
+        'html',
+        'java',
+        'kotlin',
+        'javascript',
+        'javascriptreact',
+        'json',
+        'lua',
+        'markdown',
+        'ruby',
+        'tsx',
+        'typescript',
+        'typescriptreact',
+        'vim',
+        'vimdoc',
+      }
+
+      treesitter.setup {
+        install_dir = vim.fn.stdpath 'data' .. '/site',
+      }
+      treesitter.install(parsers)
+
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = filetypes,
+        group = vim.api.nvim_create_augroup('kickstart-treesitter', { clear = true }),
+        callback = function(event)
+          if not pcall(vim.treesitter.start, event.buf) then
+            return
+          end
+
+          if vim.bo[event.buf].filetype ~= 'ruby' then
+            vim.bo[event.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+          end
+        end,
+      })
+    end,
   },
 
   { import = 'custom.plugins' },
